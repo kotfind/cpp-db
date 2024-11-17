@@ -12,5 +12,7 @@ endif()
 set(CMAKE_CXX_FLAGS_DEBUG "-fdiagnostics-color=always -fsanitize=undefined,address,float-divide-by-zero,float-cast-overflow -g3 -O0")
 set(CMAKE_CXX_FLAGS_RELEASE "-g0 -O2")
 
+include_directories(src)
+
 add_subdirectory(src)
 add_subdirectory(tests)

@@ -1,15 +1,15 @@
-add_executable(tests)
+add_library(test_utils STATIC)
 
-target_sources(tests
+target_sources(test_utils
     PUBLIC
-        test_utils.hpp
+        Test.hpp
+        TestGroup.hpp
+        Tester.hpp
+        macro.hpp
 
     PRIVATE
         Test.cpp
         TestError.cpp
         TestGroup.cpp
         Tester.cpp
-        main.cpp
 )
-
-add_custom_target(test COMMAND tests)

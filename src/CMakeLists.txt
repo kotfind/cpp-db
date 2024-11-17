@@ -1,3 +1,8 @@
-add_executable(cpp-db main.cpp)
+add_library(cpp-db STATIC)
 
-add_custom_target(run COMMAND cpp-db)
+target_sources(cpp-db
+    PUBLIC
+        mul.hpp
+    PRIVATE
+        mul.cpp
+)
