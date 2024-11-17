@@ -20,10 +20,10 @@
 #define TEST(...) GET_MACRO(_0, ##__VA_ARGS__, __TEST_2, __TEST_1, ARG_NUM_ERROR)(__VA_ARGS__)
 
 #define __TEST_1(name) \
-    Test name(#name, nullptr, []() {
+    static Test name(#name, nullptr, []() {
 
 #define __TEST_2(name, group) \
-    Test name(#name, &group, []() {
+    static Test name(#name, &group, []() {
 
 #define END_TEST \
         return true; \

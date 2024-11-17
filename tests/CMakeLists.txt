@@ -4,6 +4,9 @@ add_executable(tests)
 target_sources(tests PRIVATE
     main.cpp
     Value.cpp
+    Column.cpp
+    Ident.cpp
+    Row.cpp
 )
 
 add_subdirectory(test_utils)

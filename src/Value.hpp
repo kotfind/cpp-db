@@ -58,4 +58,6 @@ class Value {
         explicit Value(std::vector<std::byte>);
 
         std::variant<int32_t, bool, std::string, std::vector<std::byte>> value;
+
+    friend bool operator==(const Value& lhs, const Value& rhs);
 };

@@ -105,3 +105,9 @@ int32_t* Value::try_get_int() { return std::get_if<int32_t>(&value); }
 bool* Value::try_get_bool() { return std::get_if<bool>(&value); }
 std::string* Value::try_get_string() { return std::get_if<std::string>(&value); }
 std::vector<std::byte>* Value::try_get_bytes() { return std::get_if<std::vector<std::byte>>(&value); }
+
+bool operator==(const Value& lhs, const Value& rhs) {
+    // Values of different types should not be compared
+    assert(lhs.get_type() == rhs.get_type());
+    return lhs.value == rhs.value;
+}

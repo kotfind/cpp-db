@@ -43,3 +43,19 @@ TEST(try_get, value)
     ASSERT_EQ(Value::from_string("Hello, world!").try_get_bytes(), nullptr);
     ASSERT_EQ(Value::from_bytes(bytes).try_get_int(), nullptr);
 END_TEST
+
+TEST(eq, value)
+    ASSERT(Value::from_int(1) == Value::from_int(1));
+    ASSERT(Value::from_int(1) != Value::from_int(2));
+
+    ASSERT(Value::from_bool(true) == Value::from_bool(true));
+    ASSERT(Value::from_bool(true) != Value::from_bool(false));
+
+    ASSERT(Value::from_string("Hello, world!") == Value::from_string("Hello, world!"));
+    ASSERT(Value::from_string("Hello, world!") != Value::from_string("Hello, C++!"));
+
+    std::vector<std::byte> bytes1{std::byte{1}, std::byte{2}, std::byte{3}};
+    std::vector<std::byte> bytes2{std::byte{1}, std::byte{2}};
+    ASSERT(Value::from_bytes(bytes1) == Value::from_bytes(bytes1));
+    ASSERT(Value::from_bytes(bytes1) != Value::from_bytes(bytes2));
+END_TEST
