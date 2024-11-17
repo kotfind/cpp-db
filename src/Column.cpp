@@ -1,9 +1,15 @@
 #include "Column.hpp"
+#include <cassert>
 
-Column::Column(Ident name, ValueType type)
-  : name(std::move(name)),
-    type(type)
-{}
+Column::Column(Ident name_, ValueType type_, std::optional<Value> default_value_)
+  : name(std::move(name_)),
+    type(type_),
+    default_value(std::move(default_value_))
+{
+    if (default_value.has_value()) {
+        assert(default_value->get_type() == type);
+    }
+}
 
 const Ident& Column::get_name() const {
     return name;
@@ -11,6 +17,10 @@ const Ident& Column::get_name() const {
 
 ValueType Column::get_type() const {
     return type;
+}
+
+const std::optional<Value>& Column::get_default_value() const {
+    return default_value;
 }
 
 bool operator==(const Column &lhs, const Column &rhs) {
