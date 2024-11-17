@@ -7,6 +7,7 @@ target_sources(tests PRIVATE
     Column.cpp
     Ident.cpp
     Row.cpp
+    Table.cpp
 )
 
 add_subdirectory(test_utils)

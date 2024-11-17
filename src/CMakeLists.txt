@@ -6,10 +6,12 @@ target_sources(cpp-db
         Column.hpp
         Ident.hpp
         Row.hpp
+        Table.hpp
 
     PRIVATE
         Value.cpp
         Column.cpp
         Ident.cpp
         Row.cpp
+        Table.cpp
 )

@@ -14,12 +14,15 @@ class Row {
         size_t size() const;
 
         const Value& operator[](size_t idx) const;
-
         Value& operator[](size_t idx);
 
         std::vector<ValueType> get_types() const;
+
+        const std::vector<Value>& get_data() const;
+        std::vector<Value>& get_data();
 
     private:
         std::vector<Value> data;
 };
 
+bool operator==(const Row &lhs, const Row &rhs);

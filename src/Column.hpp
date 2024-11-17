@@ -15,3 +15,5 @@ class Column {
         Ident name;
         ValueType type;
 };
+
+bool operator==(const Column &lhs, const Column &rhs);

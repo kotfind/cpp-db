@@ -31,3 +31,16 @@ std::vector<ValueType> Row::get_types() const {
     
     return ans;
 }
+
+const std::vector<Value>& Row::get_data() const {
+    return data;
+}
+
+std::vector<Value>& Row::get_data() {
+    return data;
+}
+
+bool operator==(const Row &lhs, const Row &rhs) {
+    assert(lhs.get_types() == rhs.get_types());
+    return lhs.get_data() == rhs.get_data();
+}

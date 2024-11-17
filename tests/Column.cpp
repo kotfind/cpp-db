@@ -10,3 +10,12 @@ TEST(simple, column)
     ASSERT_EQ(col.get_name(), Ident("id"));
     ASSERT_EQ(col.get_type(), ValueType::INT);
 END_TEST
+
+TEST(eq, column)
+    Column col1(Ident("id"), ValueType::INT);
+    Column col2(Ident("id"), ValueType::STRING);
+    Column col3(Ident("age"), ValueType::INT);
+    ASSERT(col1 == col1);
+    ASSERT(col1 != col2);
+    ASSERT(col1 != col3);
+END_TEST
