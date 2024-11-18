@@ -6,6 +6,7 @@
 #include "RowInitializerNamed.hpp"
 #include "Value.hpp"
 
+#include <memory>
 #include <vector>
 
 class Table {
@@ -17,8 +18,8 @@ class Table {
         const std::vector<Column>& get_columns() const;
         std::vector<Column>& get_columns();
 
-        const std::vector<Row>& get_rows() const;
-        std::vector<Row>& get_rows();
+        const std::vector<std::unique_ptr<Row>>& get_rows() const;
+        std::vector<std::unique_ptr<Row>>& get_rows();
 
         std::vector<ValueType> get_types() const;
 
@@ -28,6 +29,6 @@ class Table {
     private:
         Ident name;
         std::vector<Column> columns;
-        std::vector<Row> rows;
+        std::vector<std::unique_ptr<Row>> rows;
         size_t last_row_id;
 };
