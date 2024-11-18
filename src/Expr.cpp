@@ -10,6 +10,18 @@ BinaryExpr::BinaryExpr(BinaryExprOp op_, std::unique_ptr<Expr> lhs_, std::unique
     rhs(std::move(rhs_))
 {}
 
+BinaryExpr::BinaryExpr(BinaryExprOp op_, Expr lhs_, Expr rhs_)
+  : op(op_),
+    lhs(std::make_unique<Expr>(std::move(lhs_))),
+    rhs(std::make_unique<Expr>(std::move(rhs_)))
+{}
+
+BinaryExpr::BinaryExpr(const BinaryExpr& other)
+  : op(other.op),
+    lhs(std::make_unique<Expr>(*other.lhs)),
+    rhs(std::make_unique<Expr>(*other.rhs))
+{}
+
 Value BinaryExpr::eval(const VarMap& vars) const {
     auto lhs = this->lhs->eval(vars);
     auto rhs = this->rhs->eval(vars);
@@ -66,6 +78,16 @@ Value BinaryExpr::eval(const VarMap& vars) const {
 UnaryExpr::UnaryExpr(UnaryExprOp op_, std::unique_ptr<Expr> arg_)
   : op(op_),
     arg(std::move(arg_))
+{}
+
+UnaryExpr::UnaryExpr(UnaryExprOp op_, Expr arg_)
+  : op(op_),
+    arg(std::make_unique<Expr>(std::move(arg_)))
+{}
+
+UnaryExpr::UnaryExpr(const UnaryExpr& other)
+  : op(other.op),
+    arg(std::make_unique<Expr>(*other.arg))
 {}
 
 Value UnaryExpr::eval(const VarMap& vars) const {
@@ -125,3 +147,24 @@ Value Expr::eval(const VarMap& vars) const {
         assert(false);
     }
 }
+
+Expr operator<(Expr lhs, Expr rhs) { return BinaryExpr(BinaryExprOp::LE, lhs, rhs); }
+Expr operator>(Expr lhs, Expr rhs) { return BinaryExpr(BinaryExprOp::GR, lhs, rhs); }
+Expr operator<=(Expr lhs, Expr rhs) { return BinaryExpr(BinaryExprOp::LEQ, lhs, rhs); }
+Expr operator>=(Expr lhs, Expr rhs) { return BinaryExpr(BinaryExprOp::GEQ, lhs, rhs); }
+Expr operator==(Expr lhs, Expr rhs) { return BinaryExpr(BinaryExprOp::EQ, lhs, rhs); }
+Expr operator!=(Expr lhs, Expr rhs) { return BinaryExpr(BinaryExprOp::NEQ, lhs, rhs); }
+
+Expr operator+(Expr lhs, Expr rhs) { return BinaryExpr(BinaryExprOp::ADD, lhs, rhs); }
+Expr operator-(Expr lhs, Expr rhs) { return BinaryExpr(BinaryExprOp::SUB, lhs, rhs); }
+Expr operator*(Expr lhs, Expr rhs) { return BinaryExpr(BinaryExprOp::MUL, lhs, rhs); }
+Expr operator/(Expr lhs, Expr rhs) { return BinaryExpr(BinaryExprOp::DIV, lhs, rhs); }
+Expr operator%(Expr lhs, Expr rhs) { return BinaryExpr(BinaryExprOp::MOD, lhs, rhs); }
+Expr operator-(Expr arg) { return UnaryExpr(UnaryExprOp::MINUS, arg); }
+
+Expr operator|(Expr lhs, Expr rhs) { return BinaryExpr(BinaryExprOp::OR, lhs, rhs); }
+Expr operator&(Expr lhs, Expr rhs) { return BinaryExpr(BinaryExprOp::AND, lhs, rhs); }
+Expr operator^(Expr lhs, Expr rhs) { return BinaryExpr(BinaryExprOp::XOR, lhs, rhs); }
+Expr operator!(Expr arg) { return UnaryExpr(UnaryExprOp::NOT, arg); }
+
+Expr len(Expr arg) { return UnaryExpr(UnaryExprOp::LEN, arg); }

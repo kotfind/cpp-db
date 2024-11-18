@@ -77,20 +77,12 @@ TEST(filter, table)
     auto table = get_filled_table();
 
     ASSERT(cmp_ids(
-        table.select_rows(BinaryExpr(
-            BinaryExprOp::EQ,
-            std::make_unique<Expr>(Ident("name")),
-            std::make_unique<Expr>(Value::from_string("Ivan"))
-        )),
+        table.select_rows(Ident("name") == Value::from_string("Ivan")),
         {1}
     ));
 
     ASSERT(cmp_ids(
-        table.select_rows(BinaryExpr(
-            BinaryExprOp::EQ,
-            std::make_unique<Expr>(Ident("is_male")),
-            std::make_unique<Expr>(Value::from_bool(true))
-        )),
+        table.select_rows(Ident("is_male")),
         {1, 3}
     ));
 END_TEST
@@ -98,18 +90,10 @@ END_TEST
 TEST(update, table)
     auto table = get_filled_table();
 
-    std::vector<std::pair<Ident, Expr>> assigmnemnts;
-
-    assigmnemnts.push_back({
-        Ident("is_male"),
-        Expr(UnaryExpr(
-            UnaryExprOp::NOT,
-            std::make_unique<Expr>(Ident("is_male"))
-        ))
-    });
-
     table.update_rows(
-        std::move(assigmnemnts),
+        {
+            { Ident("is_male"), !Ident("is_male") }
+        },
         Value::from_bool(true)
     );
 
@@ -121,10 +105,7 @@ END_TEST
 TEST(delete_, table)
     auto table = get_filled_table();
 
-    table.delete_rows(UnaryExpr(
-        UnaryExprOp::NOT,
-        std::make_unique<Expr>(Ident("is_male"))
-    ));
+    table.delete_rows(!Ident("is_male"));
 
     ASSERT(cmp_ids(
         table.select_rows(Value::from_bool(true)),

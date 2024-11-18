@@ -31,6 +31,8 @@ enum class BinaryExprOp {
 class BinaryExpr {
     public:
         BinaryExpr(BinaryExprOp op, std::unique_ptr<Expr> lhs, std::unique_ptr<Expr> rhs);
+        BinaryExpr(BinaryExprOp op, Expr lhs, Expr rhs);
+        BinaryExpr(const BinaryExpr& other);
 
         Value eval(const VarMap& vars) const;
 
@@ -49,6 +51,8 @@ enum class UnaryExprOp {
 class UnaryExpr {
     public:
         UnaryExpr(UnaryExprOp op, std::unique_ptr<Expr> arg);
+        UnaryExpr(UnaryExprOp op, Expr arg);
+        UnaryExpr(const UnaryExpr& other);
 
         Value eval(const VarMap& vars) const;
 
@@ -74,3 +78,25 @@ class Expr {
             Ident
         > inner;
 };
+
+
+Expr operator<(Expr lhs, Expr rhs);
+Expr operator>(Expr lhs, Expr rhs);
+Expr operator<=(Expr lhs, Expr rhs);
+Expr operator>=(Expr lhs, Expr rhs);
+Expr operator==(Expr lhs, Expr rhs);
+Expr operator!=(Expr lhs, Expr rhs);
+
+Expr operator+(Expr lhs, Expr rhs);
+Expr operator-(Expr lhs, Expr rhs);
+Expr operator*(Expr lhs, Expr rhs);
+Expr operator/(Expr lhs, Expr rhs);
+Expr operator%(Expr lhs, Expr rhs);
+Expr operator-(Expr arg);
+
+Expr operator|(Expr lhs, Expr rhs);
+Expr operator&(Expr lhs, Expr rhs);
+Expr operator^(Expr lhs, Expr rhs);
+Expr operator!(Expr arg);
+
+Expr len(Expr arg);
