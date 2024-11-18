@@ -96,6 +96,20 @@ std::vector<Row*> Table::update_rows(
     return ans;
 }
 
+std::vector<std::unique_ptr<Row>> Table::delete_rows(const Expr& cond) {
+    std::vector<std::unique_ptr<Row>> ans;
+
+    for (auto it = rows.begin(); it != rows.end();) {
+        if (cond.eval(it->second->to_vars()).get_bool()) {
+            ans.push_back(std::move(it->second));
+            it = rows.erase(it);
+        } else {
+            ++it;
+        }
+    }
+
+    return ans;
+}
 
 size_t Table::get_coulmn_num_by_name(const Ident& name) const {
     // TODO: optimize

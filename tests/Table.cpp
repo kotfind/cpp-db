@@ -95,7 +95,7 @@ TEST(filter, table)
     ));
 END_TEST
 
-TEST(upd, table)
+TEST(update, table)
     auto table = get_filled_table();
 
     std::vector<std::pair<Ident, Expr>> assigmnemnts;
@@ -116,4 +116,18 @@ TEST(upd, table)
     ASSERT_EQ((*table.get_row_by_id(1))[1], Value::from_bool(false));
     ASSERT_EQ((*table.get_row_by_id(2))[1], Value::from_bool(true));
     ASSERT_EQ((*table.get_row_by_id(3))[1], Value::from_bool(false));
+END_TEST
+
+TEST(delete_, table)
+    auto table = get_filled_table();
+
+    table.delete_rows(UnaryExpr(
+        UnaryExprOp::NOT,
+        std::make_unique<Expr>(Ident("is_male"))
+    ));
+
+    ASSERT(cmp_ids(
+        table.select_rows(Value::from_bool(true)),
+        {1, 3}
+    ));
 END_TEST

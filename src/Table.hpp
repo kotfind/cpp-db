@@ -33,6 +33,8 @@ class Table {
 
         std::vector<Row*> update_rows(const std::vector<std::pair<Ident, Expr>>& assignments, const Expr& cond);
 
+        std::vector<std::unique_ptr<Row>> delete_rows(const Expr& cond);
+
         std::vector<ValueType> get_types() const;
 
         void push_row_named(RowInitializerNamed initializer);
