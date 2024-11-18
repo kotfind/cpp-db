@@ -32,7 +32,7 @@ class BinaryExpr {
     public:
         BinaryExpr(BinaryExprOp op, std::unique_ptr<Expr> lhs, std::unique_ptr<Expr> rhs);
 
-        Value eval(const VarMap& vars);
+        Value eval(const VarMap& vars) const;
 
     private:
         BinaryExprOp op;
@@ -50,7 +50,7 @@ class UnaryExpr {
     public:
         UnaryExpr(UnaryExprOp op, std::unique_ptr<Expr> arg);
 
-        Value eval(const VarMap& vars);
+        Value eval(const VarMap& vars) const;
 
     private:
         UnaryExprOp op;
@@ -64,7 +64,7 @@ class Expr {
         Expr(Value value);
         Expr(Ident ident);
 
-        Value eval(const VarMap& vars);
+        Value eval(const VarMap& vars) const;
 
     private:
         std::variant<

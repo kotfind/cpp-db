@@ -9,6 +9,8 @@
 #include <memory>
 #include <vector>
 
+class Expr;
+
 class Table {
     public:
         Table(Ident name, std::vector<Column> columns);
@@ -20,6 +22,8 @@ class Table {
 
         const std::vector<std::unique_ptr<Row>>& get_rows() const;
         std::vector<std::unique_ptr<Row>>& get_rows();
+
+        std::vector<Row*> get_filtered_rows(const Expr& expr) const;
 
         std::vector<ValueType> get_types() const;
 

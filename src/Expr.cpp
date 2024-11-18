@@ -10,7 +10,7 @@ BinaryExpr::BinaryExpr(BinaryExprOp op_, std::unique_ptr<Expr> lhs_, std::unique
     rhs(std::move(rhs_))
 {}
 
-Value BinaryExpr::eval(const VarMap& vars) {
+Value BinaryExpr::eval(const VarMap& vars) const {
     auto lhs = this->lhs->eval(vars);
     auto rhs = this->rhs->eval(vars);
 
@@ -68,7 +68,7 @@ UnaryExpr::UnaryExpr(UnaryExprOp op_, std::unique_ptr<Expr> arg_)
     arg(std::move(arg_))
 {}
 
-Value UnaryExpr::eval(const VarMap& vars) {
+Value UnaryExpr::eval(const VarMap& vars) const {
     auto arg = this->arg->eval(vars);
     switch (op) {
         case UnaryExprOp::MINUS:
@@ -108,7 +108,7 @@ Expr::Expr(Ident ident)
   : inner(std::move(ident))
 {}
 
-Value Expr::eval(const VarMap& vars) {
+Value Expr::eval(const VarMap& vars) const {
     if (auto* binary = std::get_if<BinaryExpr>(&inner)) {
         return binary->eval(vars);
     } else if (auto* unary = std::get_if<UnaryExpr>(&inner)) {
