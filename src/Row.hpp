@@ -1,15 +1,20 @@
 #pragma once
 
+#include "RowInitializerNamed.hpp"
+#include "RowInitializerPositioned.hpp"
 #include "Value.hpp"
 
 #include <cstddef>
 #include <vector>
 
 class Value;
+class Table;
 
 class Row {
     public:
-        Row(size_t row_id, std::vector<Value> data);
+        size_t get_id() const;
+
+        Table* get_table() const;
 
         size_t size() const;
 
@@ -21,9 +26,17 @@ class Row {
         const std::vector<Value>& get_data() const;
         std::vector<Value>& get_data();
 
-        size_t get_id() const;
-
     private:
+        /// Row is created from table
+        Row(Table* table, size_t row_id, std::vector<Value> data);
+
+        Row(Table* table, size_t row_id, RowInitializerNamed initializer);
+
+        Row(Table* table, size_t row_id, RowInitializerPositioned initializer);
+
+        Table* table;
         size_t id;
         std::vector<Value> data;
+
+    friend Table;
 };

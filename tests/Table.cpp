@@ -7,7 +7,6 @@ TEST_GROUP(table)
 
 Table get_sample_table() {
     Table table(Ident("people"), {
-        Column(Ident("id"), ValueType::INT),
         Column(Ident("name"), ValueType::STRING),
         Column(Ident("is_male"), ValueType::BOOL),
     });
@@ -21,32 +20,34 @@ END_TEST
 TEST(get_columns, table)
     auto columns = get_sample_table().get_columns();
 
-    ASSERT_EQ(columns[0], Column(Ident("id"), ValueType::INT));
-    ASSERT_EQ(columns[1], Column(Ident("name"), ValueType::STRING));
-    ASSERT_EQ(columns[2], Column(Ident("is_male"), ValueType::BOOL));
+    ASSERT_EQ(columns[0], Column(Ident("name"), ValueType::STRING));
+    ASSERT_EQ(columns[1], Column(Ident("is_male"), ValueType::BOOL));
 END_TEST
 
 TEST(get_types, table)
     auto types = get_sample_table().get_types();
 
-    ASSERT_EQ(types[0], ValueType::INT);
-    ASSERT_EQ(types[1], ValueType::STRING);
-    ASSERT_EQ(types[2], ValueType::BOOL);
+    ASSERT_EQ(types[0], ValueType::STRING);
+    ASSERT_EQ(types[1], ValueType::BOOL);
 END_TEST
 
 TEST(rows, table)
     auto table = get_sample_table();
 
-    Row row1(1, {Value::from_int(1), Value::from_string("Ivan"), Value::from_bool(true)});
-    Row row2(2, {Value::from_int(2), Value::from_string("Ann"), Value::from_bool(false)});
-    Row row3(3, {Value::from_int(3), Value::from_string("Jim"), Value::from_bool(true)});
-
-    table.push_row(row1);
-    table.push_row(row2);
-    table.push_row(row3);
+    table.push_row({{Value::from_string("Ivan"), Value::from_bool(true)}});
+    table.push_row({{Value::from_string("Ann"), Value::from_bool(false)}});
+    table.push_row({{Value::from_string("Jim"), Value::from_bool(true)}});
 
     auto rows = table.get_rows();
-    ASSERT_EQ(rows[0].get_data(), row1.get_data());
-    ASSERT_EQ(rows[1].get_data(), row2.get_data());
-    ASSERT_EQ(rows[2].get_data(), row3.get_data());
+    ASSERT_EQ(rows[0].get_id(), 1);
+    ASSERT_EQ(rows[0][0], Value::from_string("Ivan"));
+    ASSERT_EQ(rows[0][1], Value::from_bool(true));
+
+    ASSERT_EQ(rows[1].get_id(), 2);
+    ASSERT_EQ(rows[1][0], Value::from_string("Ann"));
+    ASSERT_EQ(rows[1][1], Value::from_bool(false));
+
+    ASSERT_EQ(rows[2].get_id(), 3);
+    ASSERT_EQ(rows[2][0], Value::from_string("Jim"));
+    ASSERT_EQ(rows[2][1], Value::from_bool(true));
 END_TEST

@@ -3,6 +3,7 @@
 #include "Column.hpp"
 #include "Ident.hpp"
 #include "Row.hpp"
+#include "RowInitializerNamed.hpp"
 #include "Value.hpp"
 
 #include <vector>
@@ -21,10 +22,12 @@ class Table {
 
         std::vector<ValueType> get_types() const;
 
-        void push_row(Row row);
+        void push_row(RowInitializerNamed initializer);
+        void push_row(RowInitializerPositioned initializer);
 
     private:
         Ident name;
         std::vector<Column> columns;
         std::vector<Row> rows;
+        size_t last_row_id;
 };

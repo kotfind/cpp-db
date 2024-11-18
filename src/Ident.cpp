@@ -3,6 +3,7 @@
 #include <cassert>
 #include <cctype>
 #include <functional>
+#include <string>
 
 Ident::Ident(std::string ident_)
   : ident(std::move(ident_))
@@ -24,4 +25,9 @@ bool operator==(const Ident& lhs, const Ident& rhs) {
 
 std::size_t std::hash<Ident>::operator()(const Ident& ident) const {
     return std::hash<std::string>()(ident.get_inner());
+}
+
+std::ostream& operator<<(std::ostream& out, const Ident& ident) {
+    out << ident.get_inner();
+    return out;
 }

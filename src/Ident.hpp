@@ -1,5 +1,6 @@
 #pragma once
 
+#include <ostream>
 #include <string>
 
 class Ident {
@@ -19,3 +20,5 @@ struct std::hash<Ident>
 {
     std::size_t operator()(const Ident& ident) const;
 };
+
+std::ostream& operator<<(std::ostream& out, const Ident& ident);

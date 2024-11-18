@@ -1,16 +1,14 @@
 #include "Table.hpp"
+#include "Row.hpp"
 
 #include <cassert>
+#include <utility>
 
 Table::Table(Ident name, std::vector<Column> columns)
   : name(std::move(name)),
-    columns(std::move(columns))
+    columns(std::move(columns)),
+    last_row_id(0)
 {}
-
-void Table::push_row(Row row) {
-    assert(row.get_types() == get_types());
-    rows.push_back(std::move(row));
-}
 
 const std::vector<Column>& Table::get_columns() const {
     return columns;
@@ -41,4 +39,12 @@ std::vector<ValueType> Table::get_types() const {
 
 const Ident& Table::get_name() const {
     return name;
+}
+
+void Table::push_row(RowInitializerNamed initializer) {
+    rows.push_back(Row(this, ++last_row_id, std::move(initializer)));
+}
+
+void Table::push_row(RowInitializerPositioned initializer) {
+    rows.push_back(Row(this, ++last_row_id, std::move(initializer)));
 }

@@ -2,16 +2,20 @@ add_library(cpp-db STATIC)
 
 target_sources(cpp-db
     PUBLIC
-        Value.hpp
         Column.hpp
         Ident.hpp
         Row.hpp
+        RowInitializerNamed.hpp
+        RowInitializerPositioned.hpp
         Table.hpp
+        Value.hpp
 
     PRIVATE
-        Value.cpp
         Column.cpp
         Ident.cpp
         Row.cpp
+        RowInitializerNamed.cpp
+        RowInitializerPositioned.cpp
         Table.cpp
+        Value.cpp
 )

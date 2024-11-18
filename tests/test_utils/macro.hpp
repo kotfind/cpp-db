@@ -13,7 +13,7 @@
     TestGroup name(#name);
 
 #define __TEST_GROUP_2(name, parent) \
-    TestGroup name(#name, parent);
+    TestGroup name(#name, &parent);
 
 // -------------------- Test --------------------
 
