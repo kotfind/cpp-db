@@ -3,8 +3,10 @@
 #include <cassert>
 #include "Value.hpp"
 
-Row::Row(std::vector<Value> data)
-  : data(std::move(data))
+Row::Row(size_t id_, std::vector<Value> data_)
+  : id(id_),
+    data(std::move(data_))
+    
 {}
 
 size_t Row::size() const {
@@ -40,7 +42,6 @@ std::vector<Value>& Row::get_data() {
     return data;
 }
 
-bool operator==(const Row &lhs, const Row &rhs) {
-    assert(lhs.get_types() == rhs.get_types());
-    return lhs.get_data() == rhs.get_data();
+size_t Row::get_id() const {
+    return id;
 }
