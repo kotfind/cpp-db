@@ -36,7 +36,7 @@ TEST_GROUP(positioned_initializer, row)
             Value::from_bool(true)
         }});
 
-        auto row = *table.get_rows().back();
+        auto& row = *table.get_row_by_id(1);
 
         ASSERT_EQ(row[0], Value::from_string("Ivan"));
         ASSERT_EQ(row[1], Value::from_bool(true));
@@ -50,7 +50,7 @@ TEST_GROUP(positioned_initializer, row)
             std::optional<Value>()
         }});
 
-        auto row = *table.get_rows().back();
+        auto& row = *table.get_row_by_id(1);
         ASSERT_EQ(row[0], Value::from_string("Ivan"));
         ASSERT_EQ(row[1], Value::from_bool(true));
     END_TEST
@@ -62,7 +62,7 @@ TEST_GROUP(positioned_initializer, row)
             Value::from_string("Ivan"),
         }});
 
-        auto row = *table.get_rows().back();
+        auto& row = *table.get_row_by_id(1);
         ASSERT_EQ(row[0], Value::from_string("Ivan"));
         ASSERT_EQ(row[1], Value::from_bool(true));
     END_TEST
@@ -77,7 +77,7 @@ TEST_GROUP(named_initializer, row)
             {Ident("is_male"), Value::from_bool(true)},
         }});
 
-        auto row = *table.get_rows().back();
+        auto& row = *table.get_row_by_id(1);
 
         ASSERT_EQ(row[0], Value::from_string("Ivan"));
         ASSERT_EQ(row[1], Value::from_bool(true));
@@ -90,7 +90,7 @@ TEST_GROUP(named_initializer, row)
             {Ident("name"), Value::from_string("Ivan")},
         }});
 
-        auto row = *table.get_rows().back();
+        auto& row = *table.get_row_by_id(1);
 
         ASSERT_EQ(row[0], Value::from_string("Ivan"));
         ASSERT_EQ(row[1], Value::from_bool(true));
@@ -98,14 +98,14 @@ TEST_GROUP(named_initializer, row)
 
 TEST(size, row)
     auto table = get_filled_table();
-    auto row = *table.get_rows().back();
+    auto& row = *table.get_row_by_id(1);
 
     ASSERT_EQ(row.size(), 2);
 END_TEST
 
 TEST(by_index, row)
     auto table = get_filled_table();
-    auto row = *table.get_rows().back();
+    auto& row = *table.get_row_by_id(1);
 
     ASSERT_EQ(row[0], Value::from_string("Ivan"));
     ASSERT_EQ(row[1], Value::from_bool(true));
@@ -113,7 +113,7 @@ END_TEST
 
 TEST(by_index_const, row)
     auto table = get_filled_table();
-    const auto const_row = *table.get_rows().back();
+    const auto& const_row = *table.get_row_by_id(1);
 
     ASSERT_EQ(const_row[0], Value::from_string("Ivan"));
     ASSERT_EQ(const_row[1], Value::from_bool(true));
@@ -121,7 +121,7 @@ END_TEST
 
 TEST(get_data, row)
     auto table = get_filled_table();
-    auto row = *table.get_rows().back();
+    auto& row = *table.get_row_by_id(1);
 
     std::vector<Value> data = {Value::from_string("Ivan"), Value::from_bool(true)};
     ASSERT_EQ(row.get_data(), data);
@@ -129,7 +129,7 @@ END_TEST
 
 TEST(types, row)
     auto table = get_filled_table();
-    auto types = table.get_rows().back()->get_types();
+    auto types = table.get_row_by_id(1)->get_types();
 
     ASSERT_EQ(types[0], ValueType::STRING);
     ASSERT_EQ(types[1], ValueType::BOOL);

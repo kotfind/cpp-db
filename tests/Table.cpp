@@ -21,10 +21,10 @@ TEST(name, table)
 END_TEST
 
 TEST(get_columns, table)
-    auto columns = get_empty_table().get_columns();
+    auto table = get_empty_table();
 
-    ASSERT_EQ(columns[0], Column(Ident("name"), ValueType::STRING));
-    ASSERT_EQ(columns[1], Column(Ident("is_male"), ValueType::BOOL));
+    ASSERT_EQ(table.get_column(0), Column(Ident("name"), ValueType::STRING));
+    ASSERT_EQ(table.get_column(1), Column(Ident("is_male"), ValueType::BOOL));
 END_TEST
 
 TEST(get_types, table)
@@ -49,19 +49,14 @@ static Table get_filled_table() {
 
 TEST(rows, table)
     auto table = get_filled_table();
-    auto& rows = table.get_rows();
+    ASSERT_EQ((*table.get_row_by_id(1))[0], Value::from_string("Ivan"));
+    ASSERT_EQ((*table.get_row_by_id(1))[1], Value::from_bool(true));
 
-    ASSERT_EQ(rows[0]->get_id(), 1);
-    ASSERT_EQ((*rows[0])[0], Value::from_string("Ivan"));
-    ASSERT_EQ((*rows[0])[1], Value::from_bool(true));
+    ASSERT_EQ((*table.get_row_by_id(2))[0], Value::from_string("Ann"));
+    ASSERT_EQ((*table.get_row_by_id(2))[1], Value::from_bool(false));
 
-    ASSERT_EQ(rows[1]->get_id(), 2);
-    ASSERT_EQ((*rows[1])[0], Value::from_string("Ann"));
-    ASSERT_EQ((*rows[1])[1], Value::from_bool(false));
-
-    ASSERT_EQ(rows[2]->get_id(), 3);
-    ASSERT_EQ((*rows[2])[0], Value::from_string("Jim"));
-    ASSERT_EQ((*rows[2])[1], Value::from_bool(true));
+    ASSERT_EQ((*table.get_row_by_id(3))[0], Value::from_string("Jim"));
+    ASSERT_EQ((*table.get_row_by_id(3))[1], Value::from_bool(true));
 END_TEST
 
 bool cmp_ids(const std::vector<Row*>& rows, const std::unordered_set<size_t>& ids) {
@@ -82,7 +77,7 @@ TEST(filter, table)
     auto table = get_filled_table();
 
     ASSERT(cmp_ids(
-        table.get_filtered_rows(BinaryExpr(
+        table.select_rows(BinaryExpr(
             BinaryExprOp::EQ,
             std::make_unique<Expr>(Ident("name")),
             std::make_unique<Expr>(Value::from_string("Ivan"))
@@ -91,7 +86,7 @@ TEST(filter, table)
     ));
 
     ASSERT(cmp_ids(
-        table.get_filtered_rows(BinaryExpr(
+        table.select_rows(BinaryExpr(
             BinaryExprOp::EQ,
             std::make_unique<Expr>(Ident("is_male")),
             std::make_unique<Expr>(Value::from_bool(true))
@@ -118,9 +113,7 @@ TEST(upd, table)
         Value::from_bool(true)
     );
 
-    const auto& rows = table.get_rows();
-
-    ASSERT_EQ((*rows[0])[1], Value::from_bool(false));
-    ASSERT_EQ((*rows[1])[1], Value::from_bool(true));
-    ASSERT_EQ((*rows[2])[1], Value::from_bool(false));
+    ASSERT_EQ((*table.get_row_by_id(1))[1], Value::from_bool(false));
+    ASSERT_EQ((*table.get_row_by_id(2))[1], Value::from_bool(true));
+    ASSERT_EQ((*table.get_row_by_id(3))[1], Value::from_bool(false));
 END_TEST

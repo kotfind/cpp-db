@@ -44,11 +44,12 @@ Row::Row(Table* table_, size_t id_, RowInitializerNamed initializer_)
     id(id_),
     data()
 {
-    data.reserve(table->get_columns().size());
+    data.reserve(table->count_columns());
     auto init_vals = std::move(initializer_.get_values());
     size_t values_used = 0;
 
-    for (const auto& col : table->get_columns()) {
+    for (size_t col_id = 0; col_id < table->count_columns(); ++col_id) {
+        auto& col = table->get_column(col_id);
         if (init_vals.contains(col.get_name())) {
             data.push_back(resolve_row_value(
                 col,
@@ -73,11 +74,11 @@ Row::Row(Table* table_, size_t id_, RowInitializerPositioned initializer_)
     id(id_),
     data()
 {
-    if (table->get_columns().size() < initializer_.get_values().size()) {
+    if (table->count_columns() < initializer_.get_values().size()) {
         throw std::invalid_argument("failed to create row: too many fields in initializer");
     }
 
-    size_t size = table->get_columns().size();
+    size_t size = table->count_columns();
     data.reserve(size);
 
     // Add columns to initializer_ if there are too few
@@ -87,7 +88,7 @@ Row::Row(Table* table_, size_t id_, RowInitializerPositioned initializer_)
 
     for (size_t i = 0; i < size; ++i) {
         auto value = initializer_.get_values()[i];
-        auto col = table->get_columns()[i];
+        auto col = table->get_column(i);
 
         if (value.has_value()) {
             if (col.get_type() != value->get_type()) {
@@ -162,9 +163,8 @@ Table* Row::get_table() const {
 
 VarMap Row::to_vars() const {
     VarMap vars;
-    const auto& cols = get_table()->get_columns();
-    for (size_t col_id = 0; col_id < cols.size(); ++col_id) {
-        vars.insert({cols[col_id].get_name(), (*this)[col_id]});
+    for (size_t col_id = 0; col_id < get_table()->count_columns(); ++col_id) {
+        vars.insert({get_table()->get_column(col_id).get_name(), (*this)[col_id]});
     }
     return vars;
 }

@@ -17,15 +17,19 @@ class Table {
 
         const Ident& get_name() const;
 
-        const std::vector<Column>& get_columns() const;
-        std::vector<Column>& get_columns();
+        size_t count_columns() const;
+        Column& get_column(size_t num);
+        Column& get_column(const Ident& ident);
+        const Column& get_column(size_t num) const;
+        const Column& get_column(const Ident& ident) const;
 
-        size_t get_coulmn_num_by_name(const Ident& name);
+        size_t count_rows() const;
+        const Row* get_row_by_id(size_t id) const;
+        Row* get_row_by_id(size_t id);
 
-        const std::vector<std::unique_ptr<Row>>& get_rows() const;
-        std::vector<std::unique_ptr<Row>>& get_rows();
+        size_t get_coulmn_num_by_name(const Ident& name) const;
 
-        std::vector<Row*> get_filtered_rows(const Expr& cond) const;
+        std::vector<Row*> select_rows(const Expr& cond) const;
 
         std::vector<Row*> update_rows(const std::vector<std::pair<Ident, Expr>>& assignments, const Expr& cond);
 
@@ -37,6 +41,6 @@ class Table {
     private:
         Ident name;
         std::vector<Column> columns;
-        std::vector<std::unique_ptr<Row>> rows;
+        std::unordered_map<size_t, std::unique_ptr<Row>> rows;
         size_t last_row_id;
 };
