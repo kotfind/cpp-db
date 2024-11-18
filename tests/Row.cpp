@@ -18,7 +18,7 @@ Table get_empty_table() {
 Table get_filled_table() {
     auto table = get_empty_table();
 
-    table.push_row({{
+    table.push_row_positioned({{
         Value::from_string("Ivan"),
         Value::from_bool(true)
     }});
@@ -28,10 +28,10 @@ Table get_filled_table() {
 
 TEST_GROUP(positioned_initializer, row)
 
-    TEST(simple, positioned_initializer)
+    TEST(full, positioned_initializer)
         auto table = get_empty_table();
 
-        table.push_row({{
+        table.push_row_positioned({{
             Value::from_string("Ivan"),
             Value::from_bool(true)
         }});
@@ -45,7 +45,7 @@ TEST_GROUP(positioned_initializer, row)
     TEST(with_default, positioned_initializer)
         auto table = get_empty_table();
 
-        table.push_row({{
+        table.push_row_positioned({{
             Value::from_string("Ivan"),
             std::optional<Value>()
         }});
@@ -58,11 +58,40 @@ TEST_GROUP(positioned_initializer, row)
     TEST(with_little_args, positioned_initializer)
         auto table = get_empty_table();
 
-        table.push_row({{
+        table.push_row_positioned({{
             Value::from_string("Ivan"),
         }});
 
         auto row = table.get_rows().back();
+        ASSERT_EQ(row[0], Value::from_string("Ivan"));
+        ASSERT_EQ(row[1], Value::from_bool(true));
+    END_TEST
+
+TEST_GROUP(named_initializer, row)
+
+    TEST(full, named_initializer)
+        auto table = get_empty_table();
+
+        table.push_row_named({{
+            {Ident("name"), Value::from_string("Ivan")},
+            {Ident("is_male"), Value::from_bool(true)},
+        }});
+
+        auto row = table.get_rows().back();
+
+        ASSERT_EQ(row[0], Value::from_string("Ivan"));
+        ASSERT_EQ(row[1], Value::from_bool(true));
+    END_TEST
+
+    TEST(with_little_args, named_initializer)
+        auto table = get_empty_table();
+
+        table.push_row_named({{
+            {Ident("name"), Value::from_string("Ivan")},
+        }});
+
+        auto row = table.get_rows().back();
+
         ASSERT_EQ(row[0], Value::from_string("Ivan"));
         ASSERT_EQ(row[1], Value::from_bool(true));
     END_TEST

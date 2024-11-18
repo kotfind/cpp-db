@@ -34,9 +34,9 @@ END_TEST
 TEST(rows, table)
     auto table = get_sample_table();
 
-    table.push_row({{Value::from_string("Ivan"), Value::from_bool(true)}});
-    table.push_row({{Value::from_string("Ann"), Value::from_bool(false)}});
-    table.push_row({{Value::from_string("Jim"), Value::from_bool(true)}});
+    table.push_row_positioned({{Value::from_string("Ivan"), Value::from_bool(true)}});
+    table.push_row_positioned({{Value::from_string("Ann"), Value::from_bool(false)}});
+    table.push_row_positioned({{Value::from_string("Jim"), Value::from_bool(true)}});
 
     auto rows = table.get_rows();
     ASSERT_EQ(rows[0].get_id(), 1);

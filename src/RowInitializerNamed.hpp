@@ -3,18 +3,17 @@
 #include "Ident.hpp"
 #include "Value.hpp"
 
-#include <utility>
-#include <vector>
+#include <unordered_map>
 
 class RowInitializerNamed {
     public:
-        RowInitializerNamed(std::vector<std::pair<Ident, Value>> values);
+        RowInitializerNamed(std::unordered_map<Ident, Value> values);
         RowInitializerNamed();
 
         void push_value(Ident name, Value value);
 
-        const std::vector<std::pair<Ident, Value>>& get_values() const;
+        const std::unordered_map<Ident, Value>& get_values() const;
 
     private:
-        std::vector<std::pair<Ident, Value>> values;
+        std::unordered_map<Ident, Value> values;
 };

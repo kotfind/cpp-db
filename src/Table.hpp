@@ -22,8 +22,8 @@ class Table {
 
         std::vector<ValueType> get_types() const;
 
-        void push_row(RowInitializerNamed initializer);
-        void push_row(RowInitializerPositioned initializer);
+        void push_row_named(RowInitializerNamed initializer);
+        void push_row_positioned(RowInitializerPositioned initializer);
 
     private:
         Ident name;

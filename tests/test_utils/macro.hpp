@@ -23,7 +23,7 @@
     static Test name(#name, nullptr, []() {
 
 #define __TEST_2(name, group) \
-    static Test name(#name, &group, []() {
+    static Test group##_##name(#name, &group, []() {
 
 #define END_TEST \
         return true; \

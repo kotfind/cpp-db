@@ -41,10 +41,10 @@ const Ident& Table::get_name() const {
     return name;
 }
 
-void Table::push_row(RowInitializerNamed initializer) {
+void Table::push_row_named(RowInitializerNamed initializer) {
     rows.push_back(Row(this, ++last_row_id, std::move(initializer)));
 }
 
-void Table::push_row(RowInitializerPositioned initializer) {
+void Table::push_row_positioned(RowInitializerPositioned initializer) {
     rows.push_back(Row(this, ++last_row_id, std::move(initializer)));
 }

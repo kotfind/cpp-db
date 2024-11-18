@@ -1,7 +1,11 @@
 #include "RowInitializerNamed.hpp"
+
+#include <cassert>
+#include <sstream>
+#include <stdexcept>
 #include <utility>
 
-RowInitializerNamed::RowInitializerNamed(std::vector<std::pair<Ident, Value>> values_)
+RowInitializerNamed::RowInitializerNamed(std::unordered_map<Ident, Value> values_)
    : values(std::move(values_))
 {}
 
@@ -10,9 +14,14 @@ RowInitializerNamed::RowInitializerNamed()
 {}
 
 void RowInitializerNamed::push_value(Ident name, Value value) {
-    values.push_back({name, value});
+    if (!values.contains(name)) {
+        std::stringstream ss;
+        ss << "failed to push_value to RowInitializerNamed: redefinition of " << name;
+        throw std::invalid_argument(ss.str());
+    }
+    values.insert({name, value});
 }
 
-const std::vector<std::pair<Ident, Value>>& RowInitializerNamed::get_values() const {
+const std::unordered_map<Ident, Value>& RowInitializerNamed::get_values() const {
     return values;
 }
