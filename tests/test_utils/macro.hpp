@@ -1,5 +1,8 @@
 #pragma once
 
+#include <sstream>
+#include <exception>
+
 /// Macro from https://stackoverflow.com/a/21371401
 #define GET_MACRO(_0, _1, _2, NAME, ...) NAME
 
@@ -33,12 +36,19 @@
 
 #define ASSERT(x) \
     if (!(x)) { \
-        return false; \
+        std::stringstream ss; \
+        ss  << "ASSERT in " << __FILE__ << ":" << __LINE__ << " failed:\n" \
+            << #x; \
+        throw std::runtime_error(ss.str()); \
     }
 
 #define ASSERT_EQ(lhs, rhs) \
     if ((lhs) != (rhs)) { \
-        return false; \
+        std::stringstream ss; \
+        ss  << "ASSERT_EQ in " << __FILE__ << ":" << __LINE__ << " failed:\n" \
+            << "    lhs: " << #lhs << "\n" \
+            << "    rhs: " << #rhs; \
+        throw std::runtime_error(ss.str()); \
     }
 
 // -------------------- Main --------------------

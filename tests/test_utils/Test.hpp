@@ -9,7 +9,7 @@ class TestError;
 
 class Test {
     public:
-        Test(std::string name, TestGroup* group, std::function<bool()> body);
+        Test(std::string name, TestGroup* group, std::function<void()> body);
 
         const std::string& get_name() const;
         std::string get_full_name() const;
@@ -23,5 +23,5 @@ class Test {
 
         std::string name;
         TestGroup* group;
-        std::function<bool()> body;
+        std::function<void()> body;
 };

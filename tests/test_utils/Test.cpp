@@ -7,18 +7,17 @@
 
 #include <iostream>
 #include <optional>
+#include <sstream>
 #include <string>
 
-Test::Test(std::string name, TestGroup* group, std::function<bool()> body)
-  : name(name),
-    body(body)
-{
-    if (group) {
-        this->group = group;
-    } else {
-        this->group = Tester::get()->get_group();
-    }
-    this->group->push_test(this);
+Test::Test(std::string name, TestGroup *group, std::function<void()> body)
+    : name(name), body(body) {
+  if (group) {
+    this->group = group;
+  } else {
+    this->group = Tester::get()->get_group();
+  }
+  this->group->push_test(this);
 }
 
 const std::string& Test::get_name() const {
@@ -69,13 +68,15 @@ std::optional<TestError> Test::run() const {
 
 std::optional<TestError> Test::run_inner() const {
     try {
-        if (body()) {
-            return std::optional<TestError>();
-        } else {
-            return std::make_optional<TestError>(this, std::string("test returned false"));
-        }
+        body();
+        return std::optional<TestError>();
+    } catch (const std::exception &e) {
+        std::stringstream ss;
+        ss  << "test failed with exception:\n"
+            << e.what();
+        return std::make_optional<TestError>(this, ss.str());
     } catch (...) {
-        return std::make_optional<TestError>(this, "test failed with exception");
+        return std::make_optional<TestError>(this, "test failed with unknown exception");
     }
 }
 
