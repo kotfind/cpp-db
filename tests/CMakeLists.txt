@@ -9,6 +9,7 @@ target_sources(tests PRIVATE
     Row.cpp
     Table.cpp
     Expr.cpp
+    Database.cpp
 )
 
 add_subdirectory(test_utils)

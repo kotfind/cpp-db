@@ -10,6 +10,7 @@ target_sources(cpp-db
         Table.hpp
         Value.hpp
         Expr.hpp
+        Database.hpp
 
     PRIVATE
         Column.cpp
@@ -20,4 +21,5 @@ target_sources(cpp-db
         Table.cpp
         Value.cpp
         Expr.cpp
+        Database.cpp
 )

@@ -18,7 +18,7 @@ Table get_empty_table() {
 Table get_filled_table() {
     auto table = get_empty_table();
 
-    table.push_row_positioned({{
+    table.insert_row_positioned({{
         Value::from_string("Ivan"),
         Value::from_bool(true)
     }});
@@ -31,7 +31,7 @@ TEST_GROUP(positioned_initializer, row)
     TEST(full, positioned_initializer)
         auto table = get_empty_table();
 
-        table.push_row_positioned({{
+        table.insert_row_positioned({{
             Value::from_string("Ivan"),
             Value::from_bool(true)
         }});
@@ -45,7 +45,7 @@ TEST_GROUP(positioned_initializer, row)
     TEST(with_default, positioned_initializer)
         auto table = get_empty_table();
 
-        table.push_row_positioned({{
+        table.insert_row_positioned({{
             Value::from_string("Ivan"),
             std::optional<Value>()
         }});
@@ -58,7 +58,7 @@ TEST_GROUP(positioned_initializer, row)
     TEST(with_little_args, positioned_initializer)
         auto table = get_empty_table();
 
-        table.push_row_positioned({{
+        table.insert_row_positioned({{
             Value::from_string("Ivan"),
         }});
 
@@ -72,7 +72,7 @@ TEST_GROUP(named_initializer, row)
     TEST(full, named_initializer)
         auto table = get_empty_table();
 
-        table.push_row_named({{
+        table.insert_row_named({{
             {Ident("name"), Value::from_string("Ivan")},
             {Ident("is_male"), Value::from_bool(true)},
         }});
@@ -86,7 +86,7 @@ TEST_GROUP(named_initializer, row)
     TEST(with_little_args, named_initializer)
         auto table = get_empty_table();
 
-        table.push_row_named({{
+        table.insert_row_named({{
             {Ident("name"), Value::from_string("Ivan")},
         }});
 

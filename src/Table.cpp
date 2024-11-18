@@ -7,9 +7,9 @@
 #include <stdexcept>
 #include <utility>
 
-Table::Table(Ident name, std::vector<Column> columns)
-  : name(std::move(name)),
-    columns(std::move(columns)),
+Table::Table(Ident name_, std::vector<Column> columns_)
+  : name(std::move(name_)),
+    columns(std::move(columns_)),
     last_row_id(0)
 {}
 
@@ -58,14 +58,18 @@ const Ident& Table::get_name() const {
     return name;
 }
 
-void Table::push_row_named(RowInitializerNamed initializer) {
+Row* Table::insert_row_named(RowInitializerNamed initializer) {
     auto row = std::unique_ptr<Row>(new Row(this, ++last_row_id, std::move(initializer)));
+    auto* row_ptr = row.get();
     rows.insert({row->get_id(), std::move(row)});
+    return row_ptr;
 }
 
-void Table::push_row_positioned(RowInitializerPositioned initializer) {
+Row* Table::insert_row_positioned(RowInitializerPositioned initializer) {
     auto row = std::unique_ptr<Row>(new Row(this, ++last_row_id, std::move(initializer)));
+    auto* row_ptr = row.get();
     rows.insert({row->get_id(), std::move(row)});
+    return row_ptr;
 }
 
 std::vector<Row*> Table::select_rows(const Expr& cond) const {
@@ -82,7 +86,7 @@ std::vector<Row*> Table::select_rows(const Expr& cond) const {
 }
 
 std::vector<Row*> Table::update_rows(
-    const std::vector<std::pair<Ident, Expr>>& assignments,
+    const std::unordered_map<Ident, Expr>& assignments,
     const Expr& cond
 ) {
     auto ans = Table::select_rows(cond);
@@ -96,19 +100,19 @@ std::vector<Row*> Table::update_rows(
     return ans;
 }
 
-std::vector<std::unique_ptr<Row>> Table::delete_rows(const Expr& cond) {
-    std::vector<std::unique_ptr<Row>> ans;
+size_t Table::delete_rows(const Expr& cond) {
+    size_t rows_affected = 0;
 
     for (auto it = rows.begin(); it != rows.end();) {
         if (cond.eval(it->second->to_vars()).get_bool()) {
-            ans.push_back(std::move(it->second));
+            ++rows_affected;
             it = rows.erase(it);
         } else {
             ++it;
         }
     }
 
-    return ans;
+    return rows_affected;
 }
 
 size_t Table::get_coulmn_num_by_name(const Ident& name) const {

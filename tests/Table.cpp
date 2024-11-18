@@ -40,9 +40,9 @@ static Table get_filled_table() {
         Column(Ident("is_male"), ValueType::BOOL),
     });
 
-    table.push_row_positioned({{Value::from_string("Ivan"), Value::from_bool(true)}});
-    table.push_row_positioned({{Value::from_string("Ann"), Value::from_bool(false)}});
-    table.push_row_positioned({{Value::from_string("Jim"), Value::from_bool(true)}});
+    table.insert_row_positioned({{Value::from_string("Ivan"), Value::from_bool(true)}});
+    table.insert_row_positioned({{Value::from_string("Ann"), Value::from_bool(false)}});
+    table.insert_row_positioned({{Value::from_string("Jim"), Value::from_bool(true)}});
 
     return table;
 }
@@ -73,7 +73,7 @@ bool cmp_ids(const std::vector<Row*>& rows, const std::unordered_set<size_t>& id
     return true;
 }
 
-TEST(filter, table)
+TEST(select, table)
     auto table = get_filled_table();
 
     ASSERT(cmp_ids(

@@ -31,14 +31,14 @@ class Table {
 
         std::vector<Row*> select_rows(const Expr& cond) const;
 
-        std::vector<Row*> update_rows(const std::vector<std::pair<Ident, Expr>>& assignments, const Expr& cond);
+        std::vector<Row*> update_rows(const std::unordered_map<Ident, Expr>& assignments, const Expr& cond);
 
-        std::vector<std::unique_ptr<Row>> delete_rows(const Expr& cond);
+        size_t delete_rows(const Expr& cond);
 
         std::vector<ValueType> get_types() const;
 
-        void push_row_named(RowInitializerNamed initializer);
-        void push_row_positioned(RowInitializerPositioned initializer);
+        Row* insert_row_named(RowInitializerNamed initializer);
+        Row* insert_row_positioned(RowInitializerPositioned initializer);
 
     private:
         Ident name;
