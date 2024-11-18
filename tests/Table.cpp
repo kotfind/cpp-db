@@ -99,3 +99,28 @@ TEST(filter, table)
         {1, 3}
     ));
 END_TEST
+
+TEST(upd, table)
+    auto table = get_filled_table();
+
+    std::vector<std::pair<Ident, Expr>> assigmnemnts;
+
+    assigmnemnts.push_back({
+        Ident("is_male"),
+        Expr(UnaryExpr(
+            UnaryExprOp::NOT,
+            std::make_unique<Expr>(Ident("is_male"))
+        ))
+    });
+
+    table.update_rows(
+        std::move(assigmnemnts),
+        Value::from_bool(true)
+    );
+
+    const auto& rows = table.get_rows();
+
+    ASSERT_EQ((*rows[0])[1], Value::from_bool(false));
+    ASSERT_EQ((*rows[1])[1], Value::from_bool(true));
+    ASSERT_EQ((*rows[2])[1], Value::from_bool(false));
+END_TEST

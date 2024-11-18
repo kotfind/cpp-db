@@ -51,21 +51,42 @@ void Table::push_row_positioned(RowInitializerPositioned initializer) {
     rows.push_back(std::unique_ptr<Row>(new Row(this, ++last_row_id, std::move(initializer))));
 }
 
-std::vector<Row*> Table::get_filtered_rows(const Expr& expr) const {
+std::vector<Row*> Table::get_filtered_rows(const Expr& cond) const {
     std::vector<Row*> ans;
 
-    for (const auto& row : rows) {
-        // TODO: optimize
-        VarMap vars;
-        for (size_t col_id = 0; col_id < get_columns().size(); ++col_id) {
-            vars.insert({get_columns()[col_id].get_name(), (*row)[col_id]});
-        }
-
+    for (const auto& row : get_rows()) {
         // TODO: use indexes
-        if (expr.eval(vars).get_bool()) {
+        if (cond.eval(row->to_vars()).get_bool()) {
             ans.push_back(row.get());
         }
     }
 
     return ans;
+}
+
+std::vector<Row*> Table::update_rows(
+    const std::vector<std::pair<Ident, Expr>>& assignments,
+    const Expr& cond
+) {
+    auto ans = Table::get_filtered_rows(cond);
+
+    for (auto* row : ans) {
+        for (const auto& [col, expr] : assignments) {
+            (*row)[col] = expr.eval(row->to_vars());
+        }
+    }
+
+    return ans;
+}
+
+
+size_t Table::get_coulmn_num_by_name(const Ident& name) {
+    // TODO: optimize
+    for (size_t col_id = 0; col_id < get_columns().size(); ++col_id) {
+        if (get_columns()[col_id].get_name() == name) {
+            return col_id;
+        }
+    }
+    // Column not found
+    assert(false);
 }

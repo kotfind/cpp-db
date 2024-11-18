@@ -20,10 +20,14 @@ class Table {
         const std::vector<Column>& get_columns() const;
         std::vector<Column>& get_columns();
 
+        size_t get_coulmn_num_by_name(const Ident& name);
+
         const std::vector<std::unique_ptr<Row>>& get_rows() const;
         std::vector<std::unique_ptr<Row>>& get_rows();
 
-        std::vector<Row*> get_filtered_rows(const Expr& expr) const;
+        std::vector<Row*> get_filtered_rows(const Expr& cond) const;
+
+        std::vector<Row*> update_rows(const std::vector<std::pair<Ident, Expr>>& assignments, const Expr& cond);
 
         std::vector<ValueType> get_types() const;
 

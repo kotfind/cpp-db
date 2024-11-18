@@ -125,6 +125,14 @@ Value& Row::operator[](size_t idx) {
     return data[idx];
 }
 
+const Value& Row::operator[](const Ident& ident) const {
+    return (*this)[get_table()->get_coulmn_num_by_name(ident)];
+}
+
+Value& Row::operator[](const Ident& ident) {
+    return (*this)[get_table()->get_coulmn_num_by_name(ident)];
+}
+
 std::vector<ValueType> Row::get_types() const {
     std::vector<ValueType> ans;
     ans.reserve(data.size());
@@ -150,4 +158,13 @@ size_t Row::get_id() const {
 
 Table* Row::get_table() const {
     return table;
+}
+
+VarMap Row::to_vars() const {
+    VarMap vars;
+    const auto& cols = get_table()->get_columns();
+    for (size_t col_id = 0; col_id < cols.size(); ++col_id) {
+        vars.insert({cols[col_id].get_name(), (*this)[col_id]});
+    }
+    return vars;
 }
