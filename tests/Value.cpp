@@ -1,3 +1,4 @@
+#include "macro.hpp"
 #include "test_utils.hpp"
 
 #include "Value.hpp"
@@ -59,3 +60,94 @@ TEST(eq, value)
     ASSERT(Value::from_bytes(bytes1) == Value::from_bytes(bytes1));
     ASSERT(Value::from_bytes(bytes1) != Value::from_bytes(bytes2));
 END_TEST
+
+
+TEST_GROUP(cmp, value)
+    TEST(le, cmp)
+        ASSERT_EQ(Value::from_int(1) < Value::from_int(2), true);
+        ASSERT_EQ(Value::from_int(2) < Value::from_int(2), false);
+        ASSERT_EQ(Value::from_int(2) < Value::from_int(1), false);
+    END_TEST
+
+    TEST(gr, cmp)
+        ASSERT_EQ(Value::from_int(1) > Value::from_int(2), false);
+        ASSERT_EQ(Value::from_int(2) > Value::from_int(2), false);
+        ASSERT_EQ(Value::from_int(2) > Value::from_int(1), true);
+    END_TEST
+
+    TEST(leq, cmp)
+        ASSERT_EQ(Value::from_int(1) <= Value::from_int(2), true);
+        ASSERT_EQ(Value::from_int(2) <= Value::from_int(2), true);
+        ASSERT_EQ(Value::from_int(2) <= Value::from_int(1), false);
+    END_TEST
+
+    TEST(geq, cmp)
+        ASSERT_EQ(Value::from_int(1) >= Value::from_int(2), false);
+        ASSERT_EQ(Value::from_int(2) >= Value::from_int(2), true);
+        ASSERT_EQ(Value::from_int(2) >= Value::from_int(1), true);
+    END_TEST
+
+    TEST(eq, cmp)
+        ASSERT_EQ(Value::from_int(1) == Value::from_int(2), false);
+        ASSERT_EQ(Value::from_int(2) == Value::from_int(2), true);
+    END_TEST
+
+    TEST(neq, cmp)
+        ASSERT_EQ(Value::from_int(1) != Value::from_int(2), true);
+        ASSERT_EQ(Value::from_int(2) != Value::from_int(2), false);
+    END_TEST
+
+TEST_GROUP(math, value)
+
+    TEST(add, math)
+        ASSERT_EQ(Value::from_int(1) + Value::from_int(2), Value::from_int(3));
+        ASSERT_EQ(Value::from_string("aba") + Value::from_string("caba"), Value::from_string("abacaba"));
+    END_TEST
+
+    TEST(sub, math)
+        ASSERT_EQ(Value::from_int(1) - Value::from_int(2), Value::from_int(-1));
+    END_TEST
+
+    TEST(mul, math)
+        ASSERT_EQ(Value::from_int(6) * Value::from_int(7), Value::from_int(42));
+    END_TEST
+
+    TEST(div, math)
+        ASSERT_EQ(Value::from_int(42) / Value::from_int(7), Value::from_int(6));
+    END_TEST
+
+    TEST(mod, math)
+        ASSERT_EQ(Value::from_int(12) / Value::from_int(5), Value::from_int(2));
+    END_TEST
+
+    TEST(minus, math)
+        ASSERT_EQ(-Value::from_int(1), Value::from_int(-1));
+    END_TEST
+
+TEST_GROUP(boolean, value)
+
+    TEST(or, boolean)
+        ASSERT_EQ(Value::from_bool(false) || Value::from_bool(false), false);
+        ASSERT_EQ(Value::from_bool( true) || Value::from_bool(false),  true);
+        ASSERT_EQ(Value::from_bool(false) || Value::from_bool( true),  true);
+        ASSERT_EQ(Value::from_bool( true) || Value::from_bool( true),  true);
+    END_TEST
+
+    TEST(and, boolean)
+        ASSERT_EQ(Value::from_bool(false) && Value::from_bool(false), false);
+        ASSERT_EQ(Value::from_bool( true) && Value::from_bool(false), false);
+        ASSERT_EQ(Value::from_bool(false) && Value::from_bool( true), false);
+        ASSERT_EQ(Value::from_bool( true) && Value::from_bool( true),  true);
+    END_TEST
+
+    TEST(xor, boolean)
+        ASSERT_EQ(Value::from_bool(false) ^ Value::from_bool(false), false);
+        ASSERT_EQ(Value::from_bool( true) ^ Value::from_bool(false),  true);
+        ASSERT_EQ(Value::from_bool(false) ^ Value::from_bool( true),  true);
+        ASSERT_EQ(Value::from_bool( true) ^ Value::from_bool( true), false);
+    END_TEST
+
+    TEST(not_, boolean)
+        ASSERT_EQ(!Value::from_bool(false),  true);
+        ASSERT_EQ(!Value::from_bool( true), false);
+    END_TEST

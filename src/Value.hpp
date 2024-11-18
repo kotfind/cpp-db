@@ -59,5 +59,22 @@ class Value {
 
         std::variant<int32_t, bool, std::string, std::vector<std::byte>> value;
 
+    friend bool operator<(const Value& lhs, const Value& rhs);
+    friend bool operator>(const Value& lhs, const Value& rhs);
+    friend bool operator<=(const Value& lhs, const Value& rhs);
+    friend bool operator>=(const Value& lhs, const Value& rhs);
     friend bool operator==(const Value& lhs, const Value& rhs);
+    friend bool operator!=(const Value& lhs, const Value& rhs);
 };
+
+Value operator+(const Value& lhs, const Value& rhs);
+Value operator-(const Value& lhs, const Value& rhs);
+Value operator*(const Value& lhs, const Value& rhs);
+Value operator/(const Value& lhs, const Value& rhs);
+Value operator%(const Value& lhs, const Value& rhs);
+Value operator-(const Value& arg);
+
+bool operator||(const Value& lhs, const Value& rhs);
+bool operator&&(const Value& lhs, const Value& rhs);
+bool operator^(const Value& lhs, const Value& rhs);
+bool operator!(const Value& arg);

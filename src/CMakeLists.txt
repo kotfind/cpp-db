@@ -9,6 +9,7 @@ target_sources(cpp-db
         RowInitializerPositioned.hpp
         Table.hpp
         Value.hpp
+        Expr.hpp
 
     PRIVATE
         Column.cpp
@@ -18,4 +19,5 @@ target_sources(cpp-db
         RowInitializerPositioned.cpp
         Table.cpp
         Value.cpp
+        Expr.cpp
 )
