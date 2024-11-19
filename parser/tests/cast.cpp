@@ -11,6 +11,9 @@
 
 #include <string>
 
+// Note: this example is good for demonstration, but bad for production
+// as it copies string_view and don't check for cast failure.
+// Check try_cast.cpp for secure but scary example.
 TEST(cast_)
     auto num_p =
         cast(
@@ -19,8 +22,7 @@ TEST(cast_)
                 c('1', '9'),
                 rep(c('0', '9'))
             )),
-            [](auto str) -> int {
-                // using try_cast and from_chars here would be better
+            [](auto str) {
                 std::string s(str);
                 return std::stoi(s);
             }
