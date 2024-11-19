@@ -1,5 +1,5 @@
-#include "macro.hpp"
 #include "test_utils.hpp"
+
 #include "Column.hpp"
 #include "Value.hpp"
 

@@ -1,9 +1,9 @@
-#include "Expr.hpp"
-#include "macro.hpp"
 #include "test_utils.hpp"
+
+#include "Expr.hpp"
 #include "Table.hpp"
 #include "Value.hpp"
-#include <memory>
+
 #include <unordered_set>
 
 TEST_GROUP(table)

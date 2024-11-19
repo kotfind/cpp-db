@@ -1,6 +1,6 @@
-#include "Expr.hpp"
-#include "macro.hpp"
 #include "test_utils.hpp"
+
+#include "Expr.hpp"
 
 TEST_GROUP(expr)
 

@@ -1,8 +1,8 @@
+#include "test_utils.hpp"
+
 #include "Database.hpp"
 #include "Column.hpp"
 #include "Table.hpp"
-#include "macro.hpp"
-#include "test_utils.hpp"
 
 TEST_GROUP(database)
 

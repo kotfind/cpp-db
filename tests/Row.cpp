@@ -1,8 +1,8 @@
+#include "test_utils.hpp"
+
 #include "Table.hpp"
 #include "Value.hpp"
 #include "Row.hpp"
-#include "macro.hpp"
-#include "test_utils.hpp"
 
 TEST_GROUP(row)
 
