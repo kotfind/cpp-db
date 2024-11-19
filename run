@@ -4,7 +4,7 @@ set -e
 
 ROOT_DIR="$(realpath "$(dirname -- "$0")")"
 BUILD_DIR="$ROOT_DIR/build"
-TARGET="test"
+TARGET="db-test"
 
 mkdir -p "$BUILD_DIR"
 

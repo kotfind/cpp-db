@@ -21,10 +21,6 @@ else()
     message(WARNING "ccache executable not found")
 endif()
 
-include_directories(src)
-
-add_subdirectory(src)
-
-add_subdirectory(tests)
-
+add_subdirectory(db)
+# add_subdirectory(tests)
 add_subdirectory(test_utils)
