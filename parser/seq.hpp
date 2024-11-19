@@ -1,17 +1,17 @@
 #pragma once
 
+#include "result.hpp"
+
 #include <string_view>
 #include <tuple>
 
-#include "result.hpp"
-
-template<typename P1, typename... Ps>
+template<typename P, typename... Ps>
 class ParseSeq {
     public:
-        using type = std::tuple<typename P1::type, typename Ps::type...>;
+        using type = std::tuple<typename P::type, typename Ps::type...>;
         using result = ParseResult<type>;
 
-        ParseSeq(P1 parser1, Ps... parsers)
+        ParseSeq(P parser1, Ps... parsers)
           : parser1(std::move(parser1)),
             parser2(std::move(parsers)...)
         {}
@@ -37,7 +37,7 @@ class ParseSeq {
         }
 
     private:
-        P1 parser1;
+        P parser1;
         ParseSeq<Ps...> parser2;
 };
 
