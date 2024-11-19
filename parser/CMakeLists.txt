@@ -5,7 +5,8 @@ add_library(${TARGET} STATIC)
 target_sources(${TARGET}
     PRIVATE
         main.cpp
-        atoms.cpp
+        string.cpp
+        char.cpp
 )
 
 target_include_directories(${TARGET}
