@@ -4,30 +4,32 @@
 
 #include <string_view>
 
-template<typename P>
-class ParseOption {
-    public:
-        using type = std::optional<typename P::type>;
-        using result = ParseResult<type>;
+namespace parser {
+    template<typename P>
+    class ParseOption {
+        public:
+            using type = std::optional<typename P::type>;
+            using result = ParseResult<type>;
 
-        ParseOption(P parser)
-          : parser(std::move(parser))
-        {}
+            ParseOption(P parser)
+              : parser(std::move(parser))
+            {}
 
-        result parse(std::string_view s) {
-            auto res = parser.parse(s);
-            if (res.is_ok()) {
-                return result::ok({res.value()}, res.str());
-            } else {
-                return result::ok(std::nullopt, s);
+            result parse(std::string_view s) {
+                auto res = parser.parse(s);
+                if (res.is_ok()) {
+                    return result::ok({res.value()}, res.str());
+                } else {
+                    return result::ok(std::nullopt, s);
+                }
             }
-        }
 
-    private:
-        P parser;
-};
+        private:
+            P parser;
+    };
 
-template<typename P>
-ParseOption<P> opt(P parser) {
-    return ParseOption<P>(std::move(parser));
+    template<typename P>
+    ParseOption<P> opt(P parser) {
+        return ParseOption<P>(std::move(parser));
+    }
 }

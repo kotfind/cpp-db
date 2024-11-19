@@ -4,22 +4,24 @@
 
 #include <string_view>
 
-class ParseString {
-    public:
-        using type = std::string_view;
-        using result = ParseResult<type>;
+namespace parser {
+    class ParseString {
+        public:
+            using type = std::string_view;
+            using result = ParseResult<type>;
 
-        ParseString(std::string_view pat, bool ignore_case = false);
+            ParseString(std::string_view pat, bool ignore_case = false);
 
-        result parse(std::string_view s);
+            result parse(std::string_view s);
 
-    private:
-        std::string_view pat;
-        bool ignore_case;
-};
+        private:
+            std::string_view pat;
+            bool ignore_case;
+    };
 
-/// Parses exact string (case sensitive)
-ParseString s(std::string_view pat);
+    /// Parses exact string (case sensitive)
+    ParseString s(std::string_view pat);
 
-/// Parses exact string (ignores case)
-ParseString S(std::string_view pat);
+    /// Parses exact string (ignores case)
+    ParseString S(std::string_view pat);
+}

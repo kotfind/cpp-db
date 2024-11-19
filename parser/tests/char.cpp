@@ -3,6 +3,8 @@
 #include "parse.hpp"
 #include "char.hpp"
 
+using namespace parser;
+
 TEST_GROUP(char_)
 
 TEST(range, char_)

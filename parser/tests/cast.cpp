@@ -11,6 +11,8 @@
 
 #include <string>
 
+using namespace parser;
+
 // Note: this example is good for demonstration, but bad for production
 // as it copies string_view and don't check for cast failure.
 // Check try_cast.cpp for secure but scary example.

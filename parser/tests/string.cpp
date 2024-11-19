@@ -3,6 +3,8 @@
 #include "parse.hpp"
 #include "string.hpp"
 
+using namespace parser;
+
 TEST_GROUP(string)
 
 TEST(case_sensitive, string)

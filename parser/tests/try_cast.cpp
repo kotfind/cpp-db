@@ -12,6 +12,8 @@
 #include <charconv>
 #include <system_error>
 
+using namespace parser;
+
 // Note: this example is pretty scary
 // check cast.cpp for less scary (but less secure) example
 TEST(try_cast_)

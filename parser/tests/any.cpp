@@ -4,6 +4,8 @@
 #include "any.hpp"
 #include "parse.hpp"
 
+using namespace parser;
+
 TEST(any_)
     auto p = any(c('A', 'Z'), c('a', 'z'), c('0', '9'));
     ASSERT_EQ(parse(p, "a"), 'a');

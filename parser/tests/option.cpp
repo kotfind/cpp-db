@@ -5,6 +5,8 @@
 #include "parse.hpp"
 #include "seq.hpp"
 
+using namespace parser;
+
 TEST(option_)
     auto p = seq(opt(c('a')), c('x'));
     using type = decltype(p)::type;

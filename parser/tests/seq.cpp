@@ -7,6 +7,8 @@
 
 #include <tuple>
 
+using namespace parser;
+
 TEST(seq_)
     auto p = seq(s("Hello"), c('A', 'Z'), s("world!"));
     ASSERT_EQ(parse(p, "HelloXworld!"), std::make_tuple("Hello", 'X', "world!"));

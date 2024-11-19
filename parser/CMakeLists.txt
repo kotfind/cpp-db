@@ -4,7 +4,6 @@ add_library(${TARGET} STATIC)
 
 target_sources(${TARGET}
     PRIVATE
-        main.cpp
         string.cpp
         char.cpp
 )
@@ -17,7 +16,7 @@ target_include_directories(${TARGET}
 )
 
 set_target_properties(${TARGET} PROPERTIES PUBLIC_HEADER
-    include/test_utils.hpp
+    include/parser.hpp
 )
 
 target_link_libraries(${TARGET} test_utils)

@@ -5,6 +5,8 @@
 #include "repeat.hpp"
 #include "parse.hpp"
 
+using namespace parser;
+
 TEST_GROUP(repeat)
 
 TEST(range, repeat)
