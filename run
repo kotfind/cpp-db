@@ -4,7 +4,10 @@ set -e
 
 ROOT_DIR="$(realpath "$(dirname -- "$0")")"
 BUILD_DIR="$ROOT_DIR/build"
-TARGET="db-test"
+TARGETS=(
+    "db-test"
+    "parser-test"
+)
 
 mkdir -p "$BUILD_DIR"
 
@@ -16,6 +19,8 @@ cmake \
 
 cmake --build "$BUILD_DIR" -- -j4
 
-cmake --build "$BUILD_DIR" --target "$TARGET"
-
 ln -sf "$BUILD_DIR/compile_commands.json" "$ROOT_DIR"
+
+for TARGET in "${TARGETS[@]}"; do
+    cmake --build "$BUILD_DIR" --target "$TARGET"
+done

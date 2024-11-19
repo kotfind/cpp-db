@@ -22,5 +22,5 @@ else()
 endif()
 
 add_subdirectory(db)
-# add_subdirectory(tests)
 add_subdirectory(test_utils)
+add_subdirectory(parser)
