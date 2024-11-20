@@ -2,7 +2,7 @@
 #include "ignore.hpp"
 #include "test_utils.hpp"
 
-#include "parser.hpp"
+#include "parse.hpp"
 #include "sequence.hpp"
 #include "char.hpp"
 #include "string.hpp"

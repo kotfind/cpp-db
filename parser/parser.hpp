@@ -1,11 +1,10 @@
 #pragma once
 
 #include "result.hpp"
-#include "view.hpp"
+
+#include "concepts.hpp"
  
 #include <memory>
-#include <optional>
-#include <stdexcept>
 #include <string_view>
 #include <type_traits>
 
@@ -25,8 +24,8 @@ namespace parser {
             };
 
             template<is_parser_of<T> P>
+            requires std::is_same<typename P::type, T>::value
             class Inner : public AbstractParser {
-                static_assert(std::is_same<typename P::type, T>::value);
 
                 public:
                     Inner(P parser_)
@@ -53,24 +52,4 @@ namespace parser {
 
             std::shared_ptr<AbstractParser> parser;
     };
-
-    /// Tries to parse WHOLE string_view with parser. Returns std::nullopt on fail
-    template<is_parser P>
-    std::optional<typename P::type> parse_opt(const P& p, std::string_view s) {
-        auto res = p.parse(s);
-        if (res.is_ok() && res.str().empty()) {
-            return std::optional<typename P::type>(std::move(res.value()));
-        }
-        return std::nullopt;
-    }
-
-    /// Tries to parse WHOLE string_view with parser. Throws std::runtime_error on fail
-    template<is_parser P>
-    typename P::type parse(const P& p, std::string_view s) {
-        auto res = parse_opt(p, s);
-        if (res.has_value()) {
-            return std::move(*res);
-        }
-        throw std::runtime_error("parse failed");
-    }
 }

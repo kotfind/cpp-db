@@ -2,7 +2,7 @@
 
 #include "option.hpp"
 #include "char.hpp"
-#include "parser.hpp"
+#include "parse.hpp"
 #include "sequence.hpp"
 
 using namespace parser;
