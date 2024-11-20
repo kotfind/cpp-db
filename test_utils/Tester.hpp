@@ -3,24 +3,26 @@
 #include <vector>
 #include <memory>
 
-class TestGroup;
-class TestError;
-class Test;
+namespace test_utils {
+    class TestGroup;
+    class TestError;
+    class Test;
 
-class Tester {
-    public:
-        static Tester* get();
+    class Tester {
+        public:
+            static Tester* get();
 
-        void run();
+            void run();
 
-        void print_stats() const;
+            void print_stats() const;
 
-        TestGroup* get_group() const;
+            TestGroup* get_group() const;
 
-    private:
-        Tester();
+        private:
+            Tester();
 
-        /// The top-level group
-        std::unique_ptr<TestGroup> group;
-        std::vector<TestError> failed;
-};
+            /// The top-level group
+            std::unique_ptr<TestGroup> group;
+            std::vector<TestError> failed;
+    };
+}

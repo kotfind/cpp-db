@@ -102,7 +102,7 @@ TEST(update, table)
     ASSERT_EQ((*table.get_row_by_id(3))[1], Value::from_bool(false));
 END_TEST
 
-TEST(delete_, table)
+TEST(delete, table)
     auto table = get_filled_table();
 
     table.delete_rows(!Ident("is_male"));

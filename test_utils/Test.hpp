@@ -4,24 +4,26 @@
 #include <optional>
 #include <string>
 
-class TestGroup;
-class TestError;
+namespace test_utils {
+    class TestGroup;
+    class TestError;
 
-class Test {
-    public:
-        Test(std::string name, TestGroup* group, std::function<void()> body);
+    class Test {
+        public:
+            Test(std::string name, TestGroup* group, std::function<void()> body);
 
-        const std::string& get_name() const;
-        std::string get_full_name() const;
-        TestGroup* get_group() const;
+            const std::string& get_name() const;
+            std::string get_full_name() const;
+            TestGroup* get_group() const;
 
-        /// Returns TestError on error and None on success
-        std::optional<TestError> run() const;
+            /// Returns TestError on error and None on success
+            std::optional<TestError> run() const;
 
-    private:
-        std::optional<TestError> run_inner() const;
+        private:
+            std::optional<TestError> run_inner() const;
 
-        std::string name;
-        TestGroup* group;
-        std::function<void()> body;
-};
+            std::string name;
+            TestGroup* group;
+            std::function<void()> body;
+    };
+}

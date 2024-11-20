@@ -15,15 +15,15 @@
 
 using namespace parser;
 
-TEST_GROUP(seq_)
+TEST_GROUP(seq)
 
-TEST(simple, seq_)
+TEST(simple, seq)
     auto p = seq(s("Hello"), c('A', 'Z'), s("world!"));
     ASSERT_EQ(parse(p, "HelloXworld!"), std::make_tuple("Hello", 'X', "world!"));
     ASSERT_EQ(parse(p, "HelloAworld!"), std::make_tuple("Hello", 'A', "world!"));
 END_TEST
 
-TEST(ignore_empty, seq_)
+TEST(ignore_empty, seq)
     auto ws = ignore(rep(any(
         c('\n'),
         c(' '),

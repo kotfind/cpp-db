@@ -7,7 +7,7 @@
 
 using namespace parser;
 
-TEST(option_)
+TEST(option)
     auto p = seq(opt(c('a')), c('x'));
     using type = decltype(p)::type;
 

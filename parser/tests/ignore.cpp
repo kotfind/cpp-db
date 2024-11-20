@@ -8,7 +8,7 @@
 
 using namespace parser;
 
-TEST(ignore_)
+TEST(ignore)
     auto p = ignore(c('a', 'z'));
 
     ASSERT_EQ(parse(p, "a"), std::tuple<>());

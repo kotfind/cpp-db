@@ -7,6 +7,6 @@
 
 using namespace parser;
 
-TEST(view_)
+TEST(view)
     ASSERT_EQ(parse(view(rep(c('a', 'z'))), "abacaba"), "abacaba");
 END_TEST

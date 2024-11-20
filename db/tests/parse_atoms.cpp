@@ -4,15 +4,15 @@
 
 using namespace parse_atoms;
 
-TEST_GROUP(parse_atoms_)
+TEST_GROUP(parse_atoms)
 
-TEST(num_, parse_atoms_)
+TEST(num, parse_atoms)
     ASSERT_EQ(parse(num(), "42"), 42);
     ASSERT_EQ(parse(num(), "-42"), -42);
     ASSERT_EQ(parse(num(), "+42"), +42);
 END_TEST
 
-TEST(ws_, parse_atoms_)
+TEST(ws, parse_atoms)
     std::vector<std::string> strs = {
         "   ",
         " \n \t ",
