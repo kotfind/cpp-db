@@ -6,41 +6,43 @@
 #include <tuple>
 
 namespace parser {
-    template<typename... Ts>
-    struct join;
+    namespace __impl {
+        template<typename... Ts>
+        struct join;
 
-    template<typename T, typename... Ts>
-    struct join<T, std::tuple<Ts...>> {
-        using type = std::tuple<T, Ts...>;
-        type value;
+        template<typename T, typename... Ts>
+        struct join<T, std::tuple<Ts...>> {
+            using type = std::tuple<T, Ts...>;
+            type value;
 
-        join(T t, std::tuple<Ts...> ts)
-          : value(std::tuple_cat(
-                std::tuple(std::move(t)),
-                std::move(ts)
-            ))
-        {}
-    };
+            join(T t, std::tuple<Ts...> ts)
+              : value(std::tuple_cat(
+                    std::tuple(std::move(t)),
+                    std::move(ts)
+                ))
+            {}
+        };
 
-    template<typename... Ts>
-    struct join<std::tuple<>, std::tuple<Ts...>> {
-        using type = std::tuple<Ts...>;
-        type value;
+        template<typename... Ts>
+        struct join<std::tuple<>, std::tuple<Ts...>> {
+            using type = std::tuple<Ts...>;
+            type value;
 
-        join(std::tuple<>, std::tuple<Ts...> ts)
-           : value(std::move(ts))
-        {}
-    };
+            join(std::tuple<>, std::tuple<Ts...> ts)
+               : value(std::move(ts))
+            {}
+        };
 
-    template<>
-    struct join<std::tuple<>, std::tuple<>> {
-        using type = std::tuple<>;
-        type value;
+        template<>
+        struct join<std::tuple<>, std::tuple<>> {
+            using type = std::tuple<>;
+            type value;
 
-        join(std::tuple<>, std::tuple<>)
-           : value(std::tuple())
-        {}
-    };
+            join(std::tuple<>, std::tuple<>)
+               : value(std::tuple())
+            {}
+        };
+    }
 
     template<typename... Ps>
     class ParseSeq;
@@ -48,7 +50,7 @@ namespace parser {
     template<typename P, typename... Ps>
     class ParseSeq<P, Ps...> {
         private:
-            using join_ = join<typename P::type, typename ParseSeq<Ps...>::type>;
+            using join_ = __impl::join<typename P::type, typename ParseSeq<Ps...>::type>;
 
         public:
             using type = join_::type;

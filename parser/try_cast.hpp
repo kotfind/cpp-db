@@ -6,13 +6,18 @@
 #include <optional>
 
 namespace parser {
-    template<typename T> struct is_std_optional : std::false_type {};
-    template<typename T> struct is_std_optional<std::optional<T>> : std::true_type {};
+    namespace __impl {
+        template<typename T>
+        struct is_std_optional : std::false_type {};
+
+        template<typename T>
+        struct is_std_optional<std::optional<T>> : std::true_type {};
+    }
 
     template<typename P, typename F>
     class ParseTryCast {
         static_assert(
-            is_std_optional<std::invoke_result_t<F, typename P::type>>::value,
+            __impl::is_std_optional<std::invoke_result_t<F, typename P::type>>::value,
             "the function should return std::optional"
         );
 
