@@ -23,18 +23,21 @@ TEST(simple, seq)
     ASSERT_EQ(parse(p, "HelloAworld!"), std::make_tuple("Hello", 'A', "world!"));
 END_TEST
 
-TEST(ignore_empty, seq)
-    auto ws = ignore(rep(any(
-        c('\n'),
-        c(' '),
-        c('\t'),
-        c('\r')
-    )));
+static auto ws = ignore(rep(any(
+    c('\n'),
+    c(' '),
+    c('\t'),
+    c('\r')
+)));
 
+TEST(some_empty, seq)
+     // ws's return std::tuple<>, so they are not included in seq's return type
     auto p = seq(
+        ws,
         s("hello"),
-        ws, // returns std::tuple<>, is not included in seq's return type
-        s("world")
+        ws,
+        s("world"),
+        ws
     );
 
     using type = decltype(p)::type;
@@ -42,4 +45,29 @@ TEST(ignore_empty, seq)
 
     ASSERT_EQ(parse(p, "helloworld"), ans);
     ASSERT_EQ(parse(p, "hello\n \t world"), ans);
+    ASSERT_EQ(parse(p, " hello\tworld\n"), ans);
+END_TEST
+
+TEST(all_empty, seq)
+    auto p = seq(
+        ignore(s("hello")),
+        ws,
+        ignore(s("world"))
+    );
+
+    std::tuple<> ans{};
+
+    ASSERT_EQ(parse(p, "hello  world"), ans);
+END_TEST
+
+TEST(single, seq)
+    auto p = seq(
+        ws,
+        s("hello"),
+        ws
+    );
+
+    // Note: result has type std::string_view, NOT std::tuple<std::string_view>
+
+    ASSERT_EQ(parse(p, "\nhello\n"), "hello");
 END_TEST
