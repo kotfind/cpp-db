@@ -6,7 +6,7 @@ file(GLOB_RECURSE SRC CONFIGURE_DEPENDS "*.cpp")
 
 target_sources(${TARGET} PRIVATE ${SRC})
 
-target_link_libraries(${TARGET} PRIVATE test_utils db)
+target_link_libraries(${TARGET} PRIVATE test_utils db parser)
 
 include_directories(..)
 

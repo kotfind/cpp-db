@@ -26,4 +26,6 @@ set_target_properties(${TARGET} PROPERTIES PUBLIC_HEADER
     include/test_utils.hpp
 )
 
+target_link_libraries(${TARGET} PRIVATE parser)
+
 add_subdirectory(tests)
