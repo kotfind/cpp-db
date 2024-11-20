@@ -1,11 +1,12 @@
 #pragma once
 
 #include "result.hpp"
+#include "concepts.hpp"
 
 #include <string_view>
 
 namespace parser {
-    template<typename P>
+    template<is_parser P>
     class ParseOption {
         public:
             using type = std::optional<typename P::type>;
@@ -28,7 +29,7 @@ namespace parser {
             P parser;
     };
 
-    template<typename P>
+    template<is_parser P>
     ParseOption<P> opt(P parser) {
         return ParseOption<P>(std::move(parser));
     }

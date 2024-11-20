@@ -1,18 +1,15 @@
 #pragma once
 
 #include "result.hpp"
+#include "concepts.hpp"
 
 #include <string_view>
 #include <type_traits>
 
 namespace parser {
-    template<typename P, typename... Ps>
+    template<is_parser P, is_parser... Ps>
+    requires (std::is_same<typename P::type, typename Ps::type>::value && ...) // all types should be the same
     class ParseAny {
-        static_assert(
-            std::conjunction_v<std::is_same<typename P::type, typename Ps::type>...>,
-            "result types of all the parsers should be the same"
-        );
-
         public:
             using type = typename P::type;
             using result = ParseResult<type>;
@@ -36,7 +33,7 @@ namespace parser {
             ParseAny<Ps...> parser2;
     };
 
-    template<typename P>
+    template<is_parser P>
     class ParseAny<P> {
         public:
             using type = typename P::type;
@@ -54,7 +51,7 @@ namespace parser {
             P parser;
     };
 
-    template<typename... Ps>
+    template<is_parser... Ps>
     ParseAny<Ps...> any(Ps... ps) {
         return ParseAny(std::move(ps)...);
     }

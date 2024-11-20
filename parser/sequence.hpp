@@ -1,6 +1,7 @@
 #pragma once
 
 #include "result.hpp"
+#include "concepts.hpp"
 
 #include <string_view>
 #include <tuple>
@@ -43,10 +44,10 @@ namespace parser {
             {}
         };
 
-        template<typename... Ps>
+        template<is_parser... Ps>
         class ParseSeqInner;
 
-        template<typename P, typename... Ps>
+        template<is_parser P, is_parser... Ps>
         class ParseSeqInner<P, Ps...> {
             private:
                 using join_ = __impl::join<typename P::type, typename ParseSeqInner<Ps...>::type>;
@@ -120,7 +121,7 @@ namespace parser {
         };
     }
 
-    template<typename... Ps>
+    template<is_parser... Ps>
     class ParseSeq {
         private:
             using unwrap_ = __impl::unwrap_singleton<typename __impl::ParseSeqInner<Ps...>::type>;
@@ -149,7 +150,7 @@ namespace parser {
             __impl::ParseSeqInner<Ps...> parser;
     };
 
-    template<typename... Ps>
+    template<is_parser... Ps>
     ParseSeq<Ps...> seq(Ps... ps) {
         return ParseSeq<Ps...>(std::move(ps)...);
     }

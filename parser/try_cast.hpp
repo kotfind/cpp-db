@@ -1,6 +1,7 @@
 #pragma once
 
 #include "result.hpp"
+#include "concepts.hpp"
 
 #include <string_view>
 #include <optional>
@@ -12,15 +13,17 @@ namespace parser {
 
         template<typename T>
         struct is_std_optional<std::optional<T>> : std::true_type {};
+
+        template<typename T>
+        concept is_std_optional_concept = is_std_optional<T>::value;
     }
 
-    template<typename P, typename F>
+    template<is_parser P, typename F>
+    requires requires(F func, P::type value) {
+        // function should return optional
+        { func(value) } -> __impl::is_std_optional_concept;
+    }
     class ParseTryCast {
-        static_assert(
-            __impl::is_std_optional<std::invoke_result_t<F, typename P::type>>::value,
-            "the function should return std::optional"
-        );
-
         public:
             using type = std::invoke_result_t<F, typename P::type>::value_type;
             using result = ParseResult<type>;
@@ -47,7 +50,11 @@ namespace parser {
             F func;
     };
 
-    template<typename P, typename F>
+    template<is_parser P, typename F>
+    requires requires(F func, P::type value) {
+        // function should return optional
+        { func(value) } -> __impl::is_std_optional_concept;
+    }
     ParseTryCast<P, F> try_cast(P parser, F func) {
         return ParseTryCast<P, F>(std::move(parser), std::move(func));
     }

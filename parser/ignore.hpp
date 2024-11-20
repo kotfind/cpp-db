@@ -1,12 +1,13 @@
 #pragma once
 
 #include "result.hpp"
+#include "concepts.hpp"
 
 #include <string_view>
 #include <tuple>
 
 namespace parser {
-    template<typename P>
+    template<is_parser P>
     class ParseIgnore {
         public:
             using type = std::tuple<>;
@@ -29,7 +30,7 @@ namespace parser {
             P parser;
     };
 
-    template<typename P>
+    template<is_parser P>
     ParseIgnore<P> ignore(P parser) {
         return ParseIgnore<P>(std::move(parser));
     }

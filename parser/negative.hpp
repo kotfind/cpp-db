@@ -1,12 +1,13 @@
 #pragma once
 
 #include "result.hpp"
+#include "concepts.hpp"
 
 #include <string_view>
 #include <tuple>
 
 namespace parser {
-    template<typename P>
+    template<is_parser P>
     class ParseNegative {
         public:
             using type = std::tuple<>;
@@ -29,7 +30,7 @@ namespace parser {
             P parser;
     };
 
-    template<typename P>
+    template<is_parser P>
     ParseNegative<P> neg(P parser) {
         return ParseNegative<P>(std::move(parser));
     }

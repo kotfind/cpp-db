@@ -1,12 +1,13 @@
 #pragma once
 
+#include "concepts.hpp"
 #include "result.hpp"
 
 #include <cassert>
 #include <string_view>
 
 namespace parser {
-    template<typename P>
+    template<is_parser P>
     class ParseView {
         public:
             using type = std::string_view;
@@ -30,7 +31,7 @@ namespace parser {
             P parser;
     };
 
-    template<typename P>
+    template<is_parser P>
     ParseView<P> view(P parser) {
         return ParseView<P>(std::move(parser));
     }

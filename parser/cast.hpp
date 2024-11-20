@@ -1,11 +1,15 @@
 #pragma once
 
+#include "concepts.hpp"
 #include "result.hpp"
 
 #include <string_view>
 
 namespace parser {
-    template<typename P, typename F>
+    template<is_parser P, typename F>
+    requires requires(F func, P::type value) {
+        func(value);
+    }
     class ParseCast {
         public:
             using type = std::invoke_result_t<F, typename P::type>;
@@ -29,7 +33,10 @@ namespace parser {
             F func;
     };
 
-    template<typename P, typename F>
+    template<is_parser P, typename F>
+    requires requires(F func, P::type value) {
+        func(value);
+    }
     ParseCast<P, F> cast(P parser, F func) {
         return ParseCast<P, F>(std::move(parser), std::move(func));
     }
