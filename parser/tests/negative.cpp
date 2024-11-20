@@ -13,6 +13,6 @@ TEST(negative)
 
     ASSERT_EQ(parse_opt(p, "a"), std::nullopt);
 
-    type ans = {std::monostate {}, 'x'};
+    type ans = {'x'};
     ASSERT_EQ(parse(p, "x"), ans);
 END_TEST

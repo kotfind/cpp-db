@@ -6,10 +6,52 @@
 #include <tuple>
 
 namespace parser {
+    template<typename... Ts>
+    struct join;
+
+    template<typename T, typename... Ts>
+    struct join<T, std::tuple<Ts...>> {
+        using type = std::tuple<T, Ts...>;
+        type value;
+
+        join(T t, std::tuple<Ts...> ts)
+          : value(std::tuple_cat(
+                std::tuple(std::move(t)),
+                std::move(ts)
+            ))
+        {}
+    };
+
+    template<typename... Ts>
+    struct join<std::tuple<>, std::tuple<Ts...>> {
+        using type = std::tuple<Ts...>;
+        type value;
+
+        join(std::tuple<>, std::tuple<Ts...> ts)
+           : value(std::move(ts))
+        {}
+    };
+
+    template<>
+    struct join<std::tuple<>, std::tuple<>> {
+        using type = std::tuple<>;
+        type value;
+
+        join(std::tuple<>, std::tuple<>)
+           : value(std::tuple())
+        {}
+    };
+
+    template<typename... Ps>
+    class ParseSeq;
+
     template<typename P, typename... Ps>
-    class ParseSeq {
+    class ParseSeq<P, Ps...> {
+        private:
+            using join_ = join<typename P::type, typename ParseSeq<Ps...>::type>;
+
         public:
-            using type = std::tuple<typename P::type, typename Ps::type...>;
+            using type = join_::type;
             using result = ParseResult<type>;
 
             ParseSeq(P parser1, Ps... parsers)
@@ -29,10 +71,10 @@ namespace parser {
                 }
 
                 return result::ok(
-                    std::tuple_cat(
-                        std::tuple(std::move(res1.value())),
+                    std::move(join_(
+                        std::move(res1.value()),
                         std::move(res2.value())
-                    ),
+                    ).value),
                     res2.str()
                 );
             }
@@ -42,26 +84,15 @@ namespace parser {
             ParseSeq<Ps...> parser2;
     };
 
-    template<typename P>
-    class ParseSeq<P> {
+    template<>
+    class ParseSeq<> {
         public:
-            using type = std::tuple<typename P::type>;
+            using type = std::tuple<>;
             using result = ParseResult<type>;
 
-            ParseSeq(P parser)
-              : parser(std::move(parser))
-            {}
-
             result parse(std::string_view s) {
-                auto res = parser.parse(s);
-                if (res.is_fail()) {
-                    return result::fail();
-                }
-                return result::ok({std::move(res.value())}, res.str());
+                return result::ok({}, s);
             }
-
-        private:
-            P parser;
     };
 
     template<typename... Ps>

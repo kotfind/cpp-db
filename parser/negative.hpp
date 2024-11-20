@@ -3,13 +3,13 @@
 #include "result.hpp"
 
 #include <string_view>
-#include <variant>
+#include <tuple>
 
 namespace parser {
     template<typename P>
     class ParseNegative {
         public:
-            using type = std::monostate;
+            using type = std::tuple<>;
             using result = ParseResult<type>;
 
             ParseNegative(P parser)
@@ -21,7 +21,7 @@ namespace parser {
                 if (res.is_ok()) {
                     return result::fail();
                 } else {
-                    return result::ok(std::monostate {}, s);
+                    return result::ok({}, s);
                 }
             }
 

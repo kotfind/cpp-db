@@ -3,13 +3,13 @@
 #include "result.hpp"
 
 #include <string_view>
-#include <variant>
+#include <tuple>
 
 namespace parser {
     template<typename P>
     class ParseForward {
         public:
-            using type = std::monostate;
+            using type = std::tuple<>;
             using result = ParseResult<type>;
 
             ParseForward(P parser)
