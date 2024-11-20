@@ -3,12 +3,13 @@
 #include "result.hpp"
 
 #include <string_view>
+#include <variant>
 
 namespace parser {
     template<typename P>
     class ParseForward {
         public:
-            using type = typename P::type;
+            using type = std::monostate;
             using result = ParseResult<type>;
 
             ParseForward(P parser)
@@ -18,7 +19,7 @@ namespace parser {
             result parse(std::string_view s) {
                 auto res = parser.parse(s);
                 if (res.is_ok()) {
-                    return result::ok(res.value(), s);
+                    return result::ok({}, s);
                 } else {
                     return result::fail();
                 }
