@@ -1,7 +1,7 @@
 #include "test_utils.hpp"
 
 #include "char.hpp"
-#include "seq.hpp"
+#include "sequence.hpp"
 #include "repeat.hpp"
 #include "parse.hpp"
 

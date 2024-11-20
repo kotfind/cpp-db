@@ -9,7 +9,7 @@
 #include "../parse.hpp"
 #include "../repeat.hpp"
 #include "../result.hpp"
-#include "../seq.hpp"
+#include "../sequence.hpp"
 #include "../string.hpp"
 #include "../try_cast.hpp"
 #include "../view.hpp"

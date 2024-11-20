@@ -1,6 +1,6 @@
 #include "test_utils.hpp"
 
-#include "seq.hpp"
+#include "sequence.hpp"
 #include "option.hpp"
 #include "any.hpp"
 #include "char.hpp"
