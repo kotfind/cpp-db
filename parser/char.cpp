@@ -8,7 +8,7 @@ namespace parser {
         max(max)
     {}
 
-    ParseChar::result ParseChar::parse(std::string_view s) {
+    ParseChar::result ParseChar::parse(std::string_view s) const {
         if (s.empty()) {
             return result::fail();
         }

@@ -10,7 +10,7 @@ namespace parser {
         ignore_case(ignore_case)
     {}
 
-    ParseString::result ParseString::parse(std::string_view s) {
+    ParseString::result ParseString::parse(std::string_view s) const {
         if (pat.size() > s.size()) {
             return result::fail();
         }

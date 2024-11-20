@@ -16,7 +16,7 @@ namespace parser {
                 func(std::move(func))
             {}
 
-            result parse(std::string_view s) {
+            result parse(std::string_view s) const {
                 auto res = parser.parse(s);
                 if (res.is_fail()) {
                     return result::fail();

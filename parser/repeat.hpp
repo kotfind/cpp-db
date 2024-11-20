@@ -19,7 +19,7 @@ namespace parser {
                 max_rep(max_rep)
             {}
 
-            result parse(std::string_view s) {
+            result parse(std::string_view s) const {
                 type ans;
                 for (size_t i = 0; i < max_rep; ++i) {
                     auto res = parser.parse(s);

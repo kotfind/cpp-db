@@ -2,7 +2,7 @@
 
 #include "char.hpp"
 #include "negative.hpp"
-#include "parse.hpp"
+#include "parser.hpp"
 #include "sequence.hpp"
 
 using namespace parser;

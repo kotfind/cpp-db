@@ -22,7 +22,7 @@ namespace parser {
                 parser2(std::move(parsers)...)
             {}
 
-            result parse(std::string_view s) {
+            result parse(std::string_view s) const {
                 auto res1 = parser1.parse(s);
                 if (res1.is_ok()) {
                     return res1;
@@ -46,7 +46,7 @@ namespace parser {
               : parser(std::move(parser))
             {}
 
-            result parse(std::string_view s) {
+            result parse(std::string_view s) const {
                 return parser.parse(s);
             }
 

@@ -12,7 +12,7 @@ namespace parser {
 
             ParseString(std::string_view pat, bool ignore_case = false);
 
-            result parse(std::string_view s);
+            result parse(std::string_view s) const;
 
         private:
             std::string_view pat;

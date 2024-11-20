@@ -60,7 +60,7 @@ namespace parser {
                     parser2(std::move(parsers)...)
                 {}
 
-                result parse(std::string_view s) {
+                result parse(std::string_view s) const {
                     auto res1 = parser1.parse(s);
                     if (res1.is_fail()) {
                         return result::fail();
@@ -91,7 +91,7 @@ namespace parser {
                 using type = std::tuple<>;
                 using result = ParseResult<type>;
 
-                result parse(std::string_view s) {
+                result parse(std::string_view s) const {
                     return result::ok({}, s);
                 }
         };
@@ -133,7 +133,7 @@ namespace parser {
               : parser({std::move(ps)...})
             {}
 
-            result parse(std::string_view s) {
+            result parse(std::string_view s) const {
                 auto res = parser.parse(s);
                 if (res.is_ok()) {
                     return result::ok(

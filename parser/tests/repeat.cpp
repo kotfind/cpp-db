@@ -3,7 +3,7 @@
 #include "char.hpp"
 #include "sequence.hpp"
 #include "repeat.hpp"
-#include "parse.hpp"
+#include "parser.hpp"
 
 using namespace parser;
 

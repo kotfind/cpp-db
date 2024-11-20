@@ -12,7 +12,7 @@ namespace parser {
 
             ParseChar(char min, char max);
 
-            result parse(std::string_view s);
+            result parse(std::string_view s) const;
 
         private:
             char min;
