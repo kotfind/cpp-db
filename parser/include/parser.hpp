@@ -13,3 +13,4 @@
 #include "../string.hpp"
 #include "../try_cast.hpp"
 #include "../view.hpp"
+#include "../macro.hpp"
