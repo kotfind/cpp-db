@@ -63,31 +63,31 @@ namespace parser {
 
     /// Parses sequence that repeats exactly reps times
     template<is_parser P, is_parser S>
-    ParseRepeat<P> betw(P parser, S separator_parser, size_t reps) {
+    ParseRepeat<P, S> betw(P parser, S separator_parser, size_t reps) {
         return betw(std::move(parser), std::move(separator_parser), reps, reps);
     }
 
     /// Parses sequence that repeats zero or more times
     template<is_parser P, is_parser S>
-    ParseRepeat<P> betw(P parser, S separator_parser) {
+    ParseRepeat<P, S> betw(P parser, S separator_parser) {
         return betw_min(std::move(parser), std::move(separator_parser), 0);
     }
 
     /// Parses sequence that repeats one or more times
     template<is_parser P, is_parser S>
-    ParseRepeat<P> betw1(P parser, S separator_parser) {
+    ParseRepeat<P, S> betw1(P parser, S separator_parser) {
         return betw_min(std::move(parser), std::move(separator_parser), 1);
     }
 
     /// Parses sequence that repeats from min_rep or more times
     template<is_parser P, is_parser S>
-    ParseRepeat<P> betw_min(P parser, S separator_parser, size_t min_rep) {
+    ParseRepeat<P, S> betw_min(P parser, S separator_parser, size_t min_rep) {
         return betw(std::move(parser), std::move(separator_parser), min_rep, std::numeric_limits<size_t>::max());
     }
 
     /// Parses sequence that repeats from max_rep or less times
     template<is_parser P, is_parser S>
-    ParseRepeat<P> betw_max(P parser, S separator_parser, size_t max_rep) {
+    ParseRepeat<P, S> betw_max(P parser, S separator_parser, size_t max_rep) {
         return betw(std::move(parser), std::move(separator_parser), 0, max_rep);
     }
 
