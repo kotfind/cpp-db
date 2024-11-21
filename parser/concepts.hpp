@@ -18,5 +18,5 @@ namespace parser {
         std::is_same<typename P::result, ParseResult<typename P::type>>::value;
 
     template<typename P, typename T>
-    concept is_parser_of = is_parser<P> && std::is_same<typename P::type, T>::value;
+    concept is_parser_for = is_parser<P> && std::is_same<typename P::type, T>::value;
 }

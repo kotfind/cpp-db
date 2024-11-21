@@ -23,7 +23,7 @@ namespace parser {
                     virtual result parse(std::string_view s) const = 0;
             };
 
-            template<is_parser_of<T> P>
+            template<is_parser_for<T> P>
             requires std::is_same<typename P::type, T>::value
             class Inner : public AbstractParser {
 
@@ -41,7 +41,7 @@ namespace parser {
             };
 
         public:
-            template<is_parser_of<T> P>
+            template<is_parser_for<T> P>
             Parser(P parser_)
               : parser(std::make_shared<Inner<P>>(std::move(parser_)))
             {}
