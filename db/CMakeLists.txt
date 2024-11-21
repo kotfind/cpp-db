@@ -13,6 +13,7 @@ target_sources(${TARGET}
         Value.cpp
         Expr.cpp
         Database.cpp
+        parsing.cpp
 )
 
 target_include_directories(${TARGET}
