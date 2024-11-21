@@ -64,12 +64,12 @@ namespace parser {
                 result parse(std::string_view s) const {
                     auto res1 = parser1.parse(s);
                     if (res1.is_fail()) {
-                        return result::fail();
+                        return result::fail(std::move(res1));
                     }
 
                     auto res2 = parser2.parse(res1.str());
                     if (res2.is_fail()) {
-                        return result::fail();
+                        return result::fail(std::move(res2));
                     }
 
                     return result::ok(
@@ -142,7 +142,7 @@ namespace parser {
                         res.str()
                     );
                 } else {
-                    return result::fail();
+                    return result::fail(std::move(res));
                 }
             }
 

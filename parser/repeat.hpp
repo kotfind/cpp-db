@@ -24,25 +24,33 @@ namespace parser {
 
             result parse(std::string_view s) const {
                 type ans;
+                ExpectedSetType last_expected_set;
 
                 while (ans.size() < max_rep) {
                     auto s_ = s;
 
                     if (!ans.empty()) {
                         auto sep_res = separator_parser.parse(s);
-                        if (sep_res.is_fail()) break;
+                        if (sep_res.is_fail()) {
+                            last_expected_set = std::move(sep_res.expected_set());
+                            break;
+                        }
                         s_ = sep_res.str();
                     }
 
                     auto res = parser.parse(s_);
-                    if (res.is_fail()) break;
+                    if (res.is_fail()) {
+                        last_expected_set = std::move(res.expected_set());
+                        break;
+                    }
 
                     ans.push_back(std::move(res.value()));
                     s = res.str();
                 }
 
                 if (ans.size() < min_rep) {
-                    return result::fail();
+                    // TODO: better error info
+                    return result::fail(std::move(last_expected_set), s);
                 } else {
                     return result::ok(ans, s);
                 }

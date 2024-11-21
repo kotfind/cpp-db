@@ -20,7 +20,7 @@ namespace parser {
             result parse(std::string_view s) const {
                 auto res = parser.parse(s);
                 if (res.is_fail()) {
-                    return result::fail();
+                    return result::fail(res);
                 }
                 assert(s.ends_with(res.str()));
                 s.remove_suffix(res.str().size());

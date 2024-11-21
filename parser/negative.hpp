@@ -20,7 +20,8 @@ namespace parser {
             result parse(std::string_view s) const {
                 auto res = parser.parse(s);
                 if (res.is_ok()) {
-                    return result::fail();
+                    // TODO: better fail reason
+                    return result::fail({"NEG"}, s);
                 } else {
                     return result::ok({}, s);
                 }

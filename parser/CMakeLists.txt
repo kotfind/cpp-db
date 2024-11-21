@@ -7,6 +7,7 @@ target_sources(${TARGET}
         string.cpp
         char.cpp
         dummy.cpp
+        parse.cpp
 )
 
 target_include_directories(${TARGET}

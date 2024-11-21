@@ -3,6 +3,8 @@
 #include "result.hpp"
 #include "concepts.hpp"
 
+#include <algorithm>
+#include <iterator>
 #include <string_view>
 #include <type_traits>
 
@@ -20,12 +22,26 @@ namespace parser {
             {}
 
             result parse(std::string_view s) const {
+                ExpectedSetType expected_set;
+
                 auto res1 = parser1.parse(s);
                 if (res1.is_ok()) {
                     return res1;
+                } else {
+                    expected_set = std::move(res1.expected_set());
                 }
 
-                return parser2.parse(s);
+                auto res2 = parser2.parse(s);
+                if (res2.is_ok()) {
+                    return res2;
+                } else {
+                    std::move(
+                        res2.expected_set().begin(),
+                        res2.expected_set().end(),
+                        std::back_inserter(expected_set)
+                    );
+                    return result::fail(expected_set, s);
+                }
             }
 
         private:

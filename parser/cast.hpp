@@ -23,7 +23,7 @@ namespace parser {
             result parse(std::string_view s) const {
                 auto res = parser.parse(s);
                 if (res.is_fail()) {
-                    return result::fail();
+                    return result::fail(res);
                 }
                 return result::ok(func(std::move(res.value())), res.str());
             }

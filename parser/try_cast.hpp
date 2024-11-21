@@ -36,11 +36,12 @@ namespace parser {
             result parse(std::string_view s) const {
                 auto res = parser.parse(s);
                 if (res.is_fail()) {
-                    return result::fail();
+                    return result::fail(res);
                 }
                 auto cast_res = func(std::move(res.value()));
                 if (!cast_res.has_value()) {
-                    return result::fail();
+                    // TODO: better error message
+                    return result::fail({"CAST_FAILED"}, s);
                 }
                 return result::ok(std::move(*cast_res), res.str());
             }

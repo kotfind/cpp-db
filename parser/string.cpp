@@ -1,8 +1,6 @@
 #include "string.hpp"
 
 #include <cctype>
-#include <limits>
-#include <iostream>
 
 namespace parser {
     ParseString::ParseString(std::string_view pat, bool ignore_case)
@@ -12,7 +10,7 @@ namespace parser {
 
     ParseString::result ParseString::parse(std::string_view s) const {
         if (pat.size() > s.size()) {
-            return result::fail();
+            return result::fail({pat}, s);
         }
 
         for (size_t i = 0; i < pat.size(); ++i) {
@@ -20,7 +18,7 @@ namespace parser {
             auto c2 = ignore_case ? tolower(pat[i]) : pat[i];
 
             if (c1 != c2) {
-                return result::fail();
+                return result::fail({pat}, s);
             }
         }
 

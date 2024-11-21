@@ -3,36 +3,53 @@
 #include <optional>
 #include <string_view>
 #include <cassert>
+#include <variant>
+#include <vector>
 
 namespace parser {
+    using ExpectedSetType = std::vector<std::string_view>;
+
     template<typename T>
     class ParseResult {
+        private:
+            struct ParseFail {
+                ExpectedSetType expected_set;
+            };
+
+            struct ParseOk {
+                T value;
+            };
+
         public:
             static ParseResult ok(T t, std::string_view s) {
-                return ParseResult({{std::move(t), s}});
+                return ParseResult(ParseOk{std::move(t)}, s);
             }
 
-            static ParseResult fail() {
-                return ParseResult(std::nullopt);
+            static ParseResult fail(ExpectedSetType expected_set, std::string_view s) {
+                return ParseResult(ParseFail{std::move(expected_set)}, s);
+            }
+
+            template<typename U>
+            static ParseResult fail(ParseResult<U> other) {
+                return ParseResult(ParseFail{std::move(other.expected_set())}, other.str());
             }
 
             const T& value() const {
                 assert(is_ok());
-                return inner->first;
+                return std::get<ParseOk>(res).value;
             }
 
-            T& value() {
-                assert(is_ok());
-                return inner->first;
+            const ExpectedSetType& expected_set() const {
+                assert(is_fail());
+                return std::get<ParseFail>(res).expected_set;
             }
 
             std::string_view str() const {
-                assert(is_ok());
-                return inner->second;
+                return s;
             }
 
             bool is_ok() const {
-                return inner.has_value();
+                return std::holds_alternative<ParseOk>(res);
             }
 
             bool is_fail() const {
@@ -40,8 +57,12 @@ namespace parser {
             }
 
         private:
-            ParseResult(std::optional<std::pair<T, std::string_view>> inner_) : inner(std::move(inner_)) {}
+            ParseResult(std::variant<ParseOk, ParseFail> res, std::string_view s)
+              : s(s),
+                res(std::move(res))
+            {}
 
-            std::optional<std::pair<T, std::string_view>> inner;
+            std::string_view s;
+            std::variant<ParseOk, ParseFail> res;
     };
 }

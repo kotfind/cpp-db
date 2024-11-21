@@ -15,6 +15,8 @@ namespace parser {
             result parse(std::string_view s) const;
 
         private:
+            std::string get_expected() const;
+
             char min;
             char max;
     };

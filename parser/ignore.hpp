@@ -22,7 +22,7 @@ namespace parser {
                 if (res.is_ok()) {
                     return result::ok({}, res.str());
                 } else {
-                    return result::fail();
+                    return result::fail(std::move(res));
                 }
             }
 
