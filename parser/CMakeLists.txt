@@ -6,6 +6,7 @@ target_sources(${TARGET}
     PRIVATE
         string.cpp
         char.cpp
+        dummy.cpp
 )
 
 target_include_directories(${TARGET}
