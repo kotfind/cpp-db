@@ -163,3 +163,32 @@ TEST(rep_max, repeat)
 
     ASSERT_EQ(parse_opt(p, "abcdefX"), std::nullopt);
 END_TEST
+
+// NOTE: all other betw_* functions are also tested, as rep_* functions
+// are implementations use them
+TEST(betw_range, repeat)
+    auto p = seq(
+        betw(c('a', 'z'), c(','), 3, 5),
+        c('X')
+    );
+    using type = decltype(p)::type;
+
+    ASSERT_EQ(parse_opt(p, "a,b,X"), std::nullopt);
+
+    {
+        type ans{{'a', 'b', 'c'}, 'X'};
+        ASSERT_EQ(parse(p, "a,b,cX"), ans);
+    }
+
+    {
+        type ans{{'a', 'b', 'c', 'd'}, 'X'};
+        ASSERT_EQ(parse(p, "a,b,c,dX"), ans);
+    }
+
+    {
+        type ans{{'a', 'b', 'c', 'd', 'e'}, 'X'};
+        ASSERT_EQ(parse(p, "a,b,c,d,eX"), ans);
+    }
+
+    ASSERT_EQ(parse_opt(p, "a,b,c,d,e,fX"), std::nullopt);
+END_TEST
