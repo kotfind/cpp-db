@@ -1,6 +1,9 @@
 #include "test_utils.hpp"
 
+#include "Column.hpp"
 #include "parsing.hpp"
+
+#include <cstring>
 
 TEST_GROUP(parsing)
 
@@ -60,11 +63,35 @@ TEST(type, parsing)
     ASSERT_EQ(parse(type_parser, "ByTes [ 123]"), ValueType::BYTES);
 END_TEST
 
-TEST(create_table_query, parsing)
-    auto str = R"(
-        CREATE TABLE people (
-            name : STR,
-            age:int = 18
-        )
-    )";
-END_TEST
+TEST_GROUP(queries, parsing)
+
+    TEST(create_table_query, queries)
+        auto str =
+            R"(CREATE TABLE people (
+                name : STR,
+                age:INT = 18
+            ))";
+        auto parsed = parse(create_table_query_parser, str);
+
+        ASSERT_EQ(parsed.table_name, Ident("people"));
+        ASSERT_EQ(parsed.columns[0], Column(Ident("name"), ValueType::STRING, std::nullopt));
+        ASSERT_EQ(parsed.columns[1], Column(Ident("age"), ValueType::INT, {Value::from_int(18)}));
+    END_TEST
+
+    TEST(insert_query, queries)
+        auto str =
+            R"(INSERT (
+                name = "Ivan",
+                age = 20
+            ) TO people)";
+
+        auto parsed = parse(insert_query_parser, str);
+
+        ASSERT_EQ(parsed.table_name, Ident("people"));
+
+        auto* row = std::get_if<RowInitializerNamed>(&parsed.row);
+        ASSERT(row != nullptr);
+
+        ASSERT_EQ(row->get_values().at(Ident("name")), Value::from_string("Ivan"));
+        ASSERT_EQ(row->get_values().at(Ident("age")), Value::from_int(20));
+    END_TEST
