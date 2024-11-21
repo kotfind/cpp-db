@@ -1,13 +1,13 @@
 #pragma once
 
-#include <optional>
 #include <string_view>
+#include <string>
 #include <cassert>
 #include <variant>
 #include <vector>
 
 namespace parser {
-    using ExpectedSetType = std::vector<std::string_view>;
+    using ExpectedSetType = std::vector<std::string>;
 
     template<typename T>
     class ParseResult {

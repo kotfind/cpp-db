@@ -4,6 +4,7 @@
 #include "concepts.hpp"
 
 #include <string_view>
+#include <optional>
 
 namespace parser {
     template<is_parser P>

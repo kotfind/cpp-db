@@ -10,7 +10,7 @@ namespace parser {
 
     ParseString::result ParseString::parse(std::string_view s) const {
         if (pat.size() > s.size()) {
-            return result::fail({pat}, s);
+            return result::fail({std::string(pat)}, s);
         }
 
         for (size_t i = 0; i < pat.size(); ++i) {
@@ -18,7 +18,7 @@ namespace parser {
             auto c2 = ignore_case ? tolower(pat[i]) : pat[i];
 
             if (c1 != c2) {
-                return result::fail({pat}, s);
+                return result::fail({std::string(pat)}, s);
             }
         }
 
