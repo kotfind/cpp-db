@@ -18,10 +18,10 @@
 #define TEST_GROUP(...) GET_MACRO(_0, ##__VA_ARGS__, __TEST_GROUP_2, __TEST_GROUP_1, ARG_NUM_ERROR)(__VA_ARGS__)
 
 #define __TEST_GROUP_1(name) \
-    test_utils::TestGroup TEST_GROUP_NAME(name)(#name);
+    static test_utils::TestGroup TEST_GROUP_NAME(name)(#name);
 
 #define __TEST_GROUP_2(name, parent) \
-    test_utils::TestGroup TEST_GROUP_NAME(name)(#name, &TEST_GROUP_NAME(parent));
+    static test_utils::TestGroup TEST_GROUP_NAME(name)(#name, &TEST_GROUP_NAME(parent));
 
 // -------------------- Test --------------------
 
