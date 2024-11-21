@@ -3,6 +3,7 @@
 #include "Ident.hpp"
 #include "Value.hpp"
 #include "Column.hpp"
+#include "queries.hpp"
 
 #include <charconv>
 #include <parser.hpp>
@@ -225,3 +226,60 @@ static is_parser_for<ValueType> auto type =
     );
 
 parser::Parser<ValueType> type_parser = type;
+
+// -------------------- Queries --------------------
+
+// TODO: attributes
+static is_parser_for<Column> auto column_def =
+    cast(
+        seq(
+            ident, // name
+            ws,
+            ignore(c(':')),
+            ws,
+            type, // type
+            opt(seq( // default_value
+                ws,
+                ignore(c('=')),
+                ws,
+                value
+            ))
+        ),
+        [](auto tup) {
+            auto [name, type, default_value] = std::move(tup);
+            return Column(
+                std::move(name),
+                std::move(type),
+                std::move(default_value)
+            );
+        }
+    );
+
+static is_parser_for<CreateTableQuery> auto create_table_query =
+    cast(
+        seq(
+            ignore(S("create")),
+            ws,
+            ignore(S("table")),
+            ws,
+            ident, // name
+            ws,
+            ignore(c('(')),
+            ws,
+            rep(seq( // columns
+                column_def,
+                ignore(opt(seq(ws, c(','), ws)))
+            )), 
+            ws,
+            ignore(c(')'))
+        ),
+        [](auto tup) {
+            auto [name, columns] = std::move(tup);
+            return CreateTableQuery {
+                .table_name = std::move(name),
+                .columns = std::move(columns),
+            };
+        }
+    );
+
+parser::Parser<CreateTableQuery> create_table_query_parser = create_table_query;

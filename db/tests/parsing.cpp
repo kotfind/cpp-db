@@ -59,3 +59,12 @@ TEST(type, parsing)
     ASSERT_EQ(parse(type_parser, "bytEs"), ValueType::BYTES);
     ASSERT_EQ(parse(type_parser, "ByTes [ 123]"), ValueType::BYTES);
 END_TEST
+
+TEST(create_table_query, parsing)
+    auto str = R"(
+        CREATE TABLE people (
+            name : STR,
+            age:int = 18
+        )
+    )";
+END_TEST
