@@ -1,6 +1,8 @@
 #include "parsing.hpp"
 
+#include "Ident.hpp"
 #include "Value.hpp"
+#include "Column.hpp"
 
 #include <charconv>
 #include <parser.hpp>
@@ -9,7 +11,7 @@
 
 using namespace parser;
 
-// -------------------- Whitespace --------------------
+// -------------------- Atoms --------------------
 static is_parser_for<char> auto ws_char =
     any(
         c(' '),
@@ -51,6 +53,24 @@ static is_parser_for<std::tuple<>> auto ws1 =
         ignore(ws_char),
         comment
     )));
+
+static is_parser_for<uint32_t> auto num =
+    try_cast(
+        view(seq(
+            c('1', '9'),
+            rep(c('0', '9'))
+        )),
+        [](auto str) -> std::optional<uint32_t> {
+            uint32_t ans;
+
+            auto res = std::from_chars(str.begin(), str.end(), ans);
+            if (res.ec == std::errc {}) {
+                return {ans};
+            } else {
+                return std::nullopt;
+            }
+        }
+    );
 
 // -------------------- Value --------------------
 
@@ -111,28 +131,21 @@ static is_parser_for<std::vector<std::byte>> auto bytes =
         }
     );
 
-static is_parser_for<int32_t> auto num =
-    try_cast(
-        view(seq(
+static is_parser_for<int32_t> auto integer =
+    cast(
+        seq(
             neg(s("0x")),
-            opt(any(c('+'), c('-'))),
-            c('1', '9'),
-            rep(c('0', '9'))
-        )),
-        [](auto str) -> std::optional<int> {
-            int32_t ans;
+            opt(any(c('+'), c('-'))), // sign
+            num // num
+        ),
+        [](auto tup) -> int32_t {
+            auto [sign, num] = std::move(tup);
 
-            // from_chars refuses to parse leading +
-            if (str.starts_with('+')) {
-                str.remove_prefix(1);
+            if (sign.has_value() && *sign == '-') {
+                num = -num;
             }
 
-            auto res = std::from_chars(str.begin(), str.end(), ans);
-            if (res.ec == std::errc {}) {
-                return {ans};
-            } else {
-                return std::nullopt;
-            }
+            return num;
         }
     );
 
@@ -141,7 +154,74 @@ static is_parser_for<Value> auto value =
         cast(string,  [](auto v) { return Value::from_string(v); }),
         cast(bytes,   [](auto v) { return Value::from_bytes(v); }),
         cast(boolean, [](auto v) { return Value::from_bool(v); }),
-        cast(num,     [](auto v) { return Value::from_int(v); })
+        cast(integer, [](auto v) { return Value::from_int(v); })
     );
 
 parser::Parser<Value> value_parser = value;
+
+// -------------------- Ident --------------------
+
+static is_parser_for<char> auto ident_first_char =
+    any(c('a', 'z'), c('A', 'Z'), c('_'));
+
+static is_parser_for<char> auto ident_char =
+    any(ident_first_char, c('0', '9'));
+
+static is_parser_for<Ident> auto ident =
+    cast(
+        view(seq(
+            ident_first_char,
+            rep(ident_char)
+        )),
+        [](auto s) { return Ident(std::string(s)); }
+    );
+
+parser::Parser<Ident> ident_parser = ident;
+
+// -------------------- Type --------------------
+
+static is_parser_for<uint32_t> auto type_size =
+    seq(
+        ws,
+        ignore(c('[')),
+        ws,
+        num, // num
+        ws,
+        ignore(c(']'))
+    );
+
+static is_parser_for<ValueType> auto type =
+    any(
+        // int
+        cast(
+            seq(
+                S("int"),
+                opt(s("32"))
+            ),
+            [](auto) { return ValueType::INT; }
+        ),
+        // bool
+        cast(
+            S("bool"),
+            [](auto) { return ValueType::BOOL; }
+        ),
+        // string
+        cast(
+            seq(
+                S("str"),
+                opt(S("ing")),
+                opt(type_size)
+            ),
+            [](auto) { return ValueType::STRING; }
+        ),
+        // bytes 
+        cast(
+            seq(
+                S("bytes"),
+                opt(type_size)
+            ),
+            [](auto) { return ValueType::BYTES; }
+        )
+    );
+
+parser::Parser<ValueType> type_parser = type;

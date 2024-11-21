@@ -40,3 +40,22 @@ TEST_GROUP(value, parsing)
         ASSERT_EQ(parse(value_parser, "-42"), Value::from_int(-42));
         ASSERT_EQ(parse(value_parser, "+42"), Value::from_int(+42));
     END_TEST
+
+TEST(ident, parsing)
+    ASSERT_EQ(parse(ident_parser, "hello_world_123"), Ident("hello_world_123"));
+END_TEST
+
+TEST(type, parsing)
+    ASSERT_EQ(parse(type_parser, "inT"), ValueType::INT);
+    ASSERT_EQ(parse(type_parser, "INt32"), ValueType::INT);
+
+    ASSERT_EQ(parse(type_parser, "BoOl"), ValueType::BOOL);
+
+    ASSERT_EQ(parse(type_parser, "stR"), ValueType::STRING);
+    ASSERT_EQ(parse(type_parser, "sTrING"), ValueType::STRING);
+    ASSERT_EQ(parse(type_parser, "string [ 123]"), ValueType::STRING);
+    ASSERT_EQ(parse(type_parser, "str[ 123]"), ValueType::STRING);
+
+    ASSERT_EQ(parse(type_parser, "bytEs"), ValueType::BYTES);
+    ASSERT_EQ(parse(type_parser, "ByTes [ 123]"), ValueType::BYTES);
+END_TEST
