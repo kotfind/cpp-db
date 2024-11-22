@@ -31,7 +31,7 @@ struct InsertQuery {
 
 struct UpdateQuery {
     const Ident table_name;
-    const std::unordered_map<Ident, Expr>& assignments;
+    const std::unordered_map<Ident, Expr> assignments;
     const Expr cond;
 };
 

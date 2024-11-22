@@ -611,6 +611,25 @@ static is_parser_for<InsertQuery> auto insert_query =
     );
 parser::Parser<InsertQuery> insert_query_parser = insert_query;
 
+// -------------------- WHERE --------------------
+
+
+static is_parser_for<Expr> auto opt_where_clause =
+    cast(
+        opt(seq( // cond
+            ws,
+            ignore(S("where")),
+            ws,
+            lazy(expr) // opt_expr
+        )),
+        [](auto opt_expr) {
+            
+            return opt_expr.has_value()
+                ? std::move(*opt_expr)
+                : Expr(Value::from_bool(true));
+        }
+    );
+
 // -------------------- Select Query --------------------
 
 static is_parser_for<SelectQuery> auto select_query = 
@@ -623,20 +642,12 @@ static is_parser_for<SelectQuery> auto select_query =
             ignore(S("from")),
             ws,
             ident, // table_name
-            opt(seq( // cond
-                ws,
-                ignore(S("where")),
-                ws,
-                lazy(expr) // expr
-            ))
+            ws,
+            opt_where_clause // cond
         ),
         [](auto tup) {
-            auto [column_names, table_name, cond_] = std::move(tup);
+            auto [column_names, table_name, cond] = std::move(tup);
             // TODO: don't ignore column_names
-            Expr cond = cond_.has_value()
-                ? std::move(*cond_)
-                : Expr(Value::from_bool(true));
-
             return SelectQuery {
                 .table_name = std::move(table_name),
                 .cond = std::move(cond)
@@ -644,3 +655,40 @@ static is_parser_for<SelectQuery> auto select_query =
         }
     );
 parser::Parser<SelectQuery> select_query_parser = select_query;
+
+// -------------------- Update Query --------------------
+static is_parser_for<UpdateQuery> auto update_query = 
+    cast(
+        seq(
+            ignore(S("update")),
+            ws,
+            ident, // table_name
+            ws,
+            ignore(S("set")),
+            ws,
+            csv(seq( // assignment_defs
+                ident, // name
+                ws,
+                ignore(c('=')),
+                ws,
+                lazy(expr) // value
+            )),
+            ws,
+            opt_where_clause // cond
+        ),
+        [](auto tup) {
+            auto [table_name, assignment_defs, cond] = std::move(tup);
+
+            std::unordered_map<Ident, Expr> assignments;
+            for (auto& [name, value] : assignment_defs) {
+                assignments.insert({std::move(name), std::move(value)});
+            }
+
+            return UpdateQuery {
+                .table_name = std::move(table_name),
+                .assignments = std::move(assignments),
+                .cond = std::move(cond),
+            };
+        }
+    );
+parser::Parser<UpdateQuery> update_query_parser = update_query;

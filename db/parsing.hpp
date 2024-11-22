@@ -16,3 +16,4 @@ extern parser::Parser<Expr> expr_parser;
 extern parser::Parser<CreateTableQuery> create_table_query_parser;
 extern parser::Parser<InsertQuery> insert_query_parser;
 extern parser::Parser<SelectQuery> select_query_parser;
+extern parser::Parser<UpdateQuery> update_query_parser;

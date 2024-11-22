@@ -134,3 +134,34 @@ TEST_GROUP(queries, parsing)
             Ident("age") > Value::from_int(18) || Ident("name") == Value::from_string("Ivan")
         ));
     END_TEST
+
+    TEST(update_query, queries)
+        auto str =
+            R"(UPDATE people
+            SET
+                name = "Peter",
+                age = 2 * age - 10,
+            WHERE
+                name == "Ivan")";
+
+        auto parsed = parse(update_query_parser, str);
+
+        // TODO: check fields
+
+        ASSERT_EQ(parsed.table_name, Ident("people"));
+
+        ASSERT(is_same(
+            parsed.cond,
+            Ident("name") == Value::from_string("Ivan")
+        ));
+
+        ASSERT(is_same(
+            parsed.assignments.at(Ident("name")),
+            Value::from_string("Peter")
+        ));
+
+        ASSERT(is_same(
+            parsed.assignments.at(Ident("age")),
+            Value::from_int(2) * Ident("age") - Value::from_int(10)
+        ));
+    END_TEST
