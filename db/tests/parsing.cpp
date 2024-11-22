@@ -97,6 +97,13 @@ TEST_GROUP(queries, parsing)
         ASSERT_EQ(parsed.columns[1], Column(Ident("age"), ValueType::INT, {Value::from_int(18)}));
     END_TEST
 
+    TEST(drop_table_query, queries)
+        auto str =
+            R"(DROP TABLE people)";
+        auto parsed = parse(drop_table_query_parser, str);
+        ASSERT_EQ(parsed.table_name, Ident("people"));
+    END_TEST
+
     TEST(insert_query, queries)
         auto str =
             R"(INSERT (

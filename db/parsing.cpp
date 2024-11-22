@@ -534,9 +534,9 @@ static is_parser_for<CreateTableQuery> auto create_table_query =
     cast(
         seq(
             ignore(S("create")),
-            ws,
+            ws1,
             ignore(S("table")),
-            ws,
+            ws1,
             ident, // name
             ws,
             braced(csv(column_def)) // columns
@@ -550,6 +550,25 @@ static is_parser_for<CreateTableQuery> auto create_table_query =
         }
     );
 parser::Parser<CreateTableQuery> create_table_query_parser = create_table_query;
+
+// -------------------- Drop Table Query --------------------
+
+static is_parser_for<DropTableQuery> auto drop_table_query =
+    cast(
+        seq(
+            ignore(S("drop")),
+            ws1,
+            ignore(S("table")),
+            ws1,
+            ident // name
+        ),
+        [](auto name) {
+            return DropTableQuery {
+                .table_name = std::move(name),
+            };
+        }
+    );
+parser::Parser<DropTableQuery> drop_table_query_parser = drop_table_query;
 
 // -------------------- Insert Query --------------------
 
@@ -597,7 +616,7 @@ static is_parser_for<InsertQuery> auto insert_query =
             row_initializer, // row
             ws,
             ignore(S("to")),
-            ws,
+            ws1,
             ident // table_name
         ),
         [](auto tup) {
@@ -617,9 +636,9 @@ parser::Parser<InsertQuery> insert_query_parser = insert_query;
 static is_parser_for<Expr> auto opt_where_clause =
     cast(
         opt(seq( // cond
-            ws,
+            ws1,
             ignore(S("where")),
-            ws,
+            ws1,
             lazy(expr) // opt_expr
         )),
         [](auto opt_expr) {
@@ -636,13 +655,12 @@ static is_parser_for<SelectQuery> auto select_query =
     cast(
         seq(
             ignore(S("select")),
-            ws,
+            ws1,
             csv(seq(neg(S("from")), ident)), // column_names
-            ws,
+            ws1,
             ignore(S("from")),
             ws,
             ident, // table_name
-            ws,
             opt_where_clause // cond
         ),
         [](auto tup) {
@@ -661,11 +679,11 @@ static is_parser_for<UpdateQuery> auto update_query =
     cast(
         seq(
             ignore(S("update")),
-            ws,
+            ws1,
             ident, // table_name
-            ws,
+            ws1,
             ignore(S("set")),
-            ws,
+            ws1,
             csv(seq( // assignment_defs
                 ident, // name
                 ws,
@@ -673,7 +691,6 @@ static is_parser_for<UpdateQuery> auto update_query =
                 ws,
                 lazy(expr) // value
             )),
-            ws,
             opt_where_clause // cond
         ),
         [](auto tup) {
@@ -698,9 +715,8 @@ static is_parser_for<DeleteQuery> auto delete_query =
     cast(
         seq(
             ignore(S("delete")),
-            ws,
+            ws1,
             ident, // table_name
-            ws,
             opt_where_clause // cond
         ),
         [](auto tup) {
