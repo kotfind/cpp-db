@@ -1,8 +1,10 @@
 #include <test_utils.hpp>
+#include <variant>
 
 #include "Database.hpp"
 #include "Column.hpp"
 #include "Table.hpp"
+#include "TempTable.hpp"
 
 TEST_GROUP(database)
 
@@ -60,22 +62,25 @@ TEST(complex, database)
 
     {
         auto resp = db.select_query({
+            .exprs = {Ident("name"), len(Ident("name"))},
             .table_name = Ident("people"),
             .cond = Ident("name") == Value::from_string("James")
         });
 
-        ASSERT_EQ(resp.size(), 1);
-        ASSERT_EQ(resp[0]->get_id(), 3);
+        ASSERT_EQ(resp.count_rows(), 1);
+        ASSERT_EQ((*resp.get_row_by_num(0))[0], Value::from_string("James"));
+        ASSERT_EQ((*resp.get_row_by_num(0))[1], Value::from_int(5));
     }
 
     {
         auto resp = db.select_query({
+            .exprs = {Ident("is_male")},
             .table_name = Ident("people"),
             .cond = len(Ident("name")) == Value::from_int(3)
         });
 
-        ASSERT_EQ(resp.size(), 1);
-        ASSERT_EQ(resp[0]->get_id(), 2);
+        ASSERT_EQ(resp.count_rows(), 1);
+        ASSERT_EQ((*resp.get_row_by_num(0))[0], Value::from_bool(false));
     }
 
     db.delete_query({
@@ -85,11 +90,12 @@ TEST(complex, database)
 
     {
         auto resp = db.select_query({
+            .exprs = {},
             .table_name = Ident("people"),
             .cond = Ident("name") == Value::from_string("James")
         });
 
-        ASSERT_EQ(resp.size(), 0);
+        ASSERT_EQ(resp.count_rows(), 0);
     }
 END_TEST
 
@@ -114,27 +120,29 @@ TEST(complex_queries, database)
     )");
 
     {
-        auto resp = db.query(R"(
+        auto resp_ = db.query(R"(
             SELECT name, is_male
             FROM people
             WHERE name == "James"
         )");
 
-        ASSERT(resp.has_value());
-        ASSERT_EQ(resp->size(), 1);
-        ASSERT_EQ((*resp)[0]->get_id(), 3);
+        auto resp = std::get_if<TempTable>(&resp_);
+        ASSERT(resp != nullptr);
+        ASSERT_EQ(resp->count_rows(), 1);
+        ASSERT_EQ((*resp->get_row_by_num(0))[0], Value::from_string("James"));
     }
 
     {
-        auto resp = db.query(R"(
+        auto resp_ = db.query(R"(
             SELECT name, is_male
             FROM people
             WHERE |name| == 3
         )");
 
-        ASSERT(resp.has_value());
-        ASSERT_EQ(resp->size(), 1);
-        ASSERT_EQ((*resp)[0]->get_id(), 2);
+        auto resp = std::get_if<TempTable>(&resp_);
+        ASSERT(resp != nullptr);
+        ASSERT_EQ(resp->count_rows(), 1);
+        ASSERT_EQ((*resp->get_row_by_num(0))[0], Value::from_string("Ann"));
     }
 
     db.query(R"(
@@ -144,14 +152,15 @@ TEST(complex_queries, database)
     )");
 
     {
-        auto resp = db.query(R"(
+        auto resp_ = db.query(R"(
             SELECT name, is_male
             FROM people
             WHERE name == "James"
         )");
 
-        ASSERT(resp.has_value());
-        ASSERT_EQ(resp->size(), 0);
+        auto resp = std::get_if<TempTable>(&resp_);
+        ASSERT(resp != nullptr);
+        ASSERT_EQ(resp->count_rows(), 0);
     }
 
     db.query("DROP TABLE people");

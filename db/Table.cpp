@@ -2,6 +2,7 @@
 #include "Expr.hpp"
 #include "Row.hpp"
 #include "Expr.hpp"
+#include "TempTable.hpp"
 
 #include <cassert>
 #include <stdexcept>
@@ -72,7 +73,7 @@ Row* Table::insert_row_positioned(RowInitializerPositioned initializer) {
     return row_ptr;
 }
 
-std::vector<Row*> Table::select_rows(const Expr& cond) const {
+std::vector<Row*> Table::filter_rows(const Expr& cond) const {
     std::vector<Row*> ans;
 
     for (const auto& [_id, row] : rows) {
@@ -85,11 +86,50 @@ std::vector<Row*> Table::select_rows(const Expr& cond) const {
     return ans;
 }
 
-std::vector<Row*> Table::update_rows(
+
+TempTable Table::select_rows(const std::vector<Expr>& exprs, const Expr& cond) const {
+    auto rows = filter_rows(cond);
+
+    if (rows.empty()) {
+        return TempTable({});
+    }
+
+    std::vector<TempRow> new_rows;
+    new_rows.reserve(rows.size());
+
+    for (auto* row : rows) {
+        auto vars = row->to_vars();
+
+        std::vector<Value> expr_vals;
+        expr_vals.reserve(exprs.size());
+        for (auto& expr : exprs) {
+            expr_vals.push_back(expr.eval(vars));
+        }
+        new_rows.push_back({{row}, std::move(expr_vals)});
+    }
+
+    auto types = new_rows[0].get_types();
+    assert(types.size() == exprs.size());
+
+    std::vector<TempColumn> columns;
+    for (size_t i = 0; i < types.size(); ++i) {
+        columns.push_back({"*EXPR*", types[i]});
+    }
+
+    TempTable tab{columns};
+
+    for (auto& row : new_rows) {
+        tab.insert_row(std::move(row));
+    }
+
+    return tab;
+}
+
+size_t Table::update_rows(
     const std::unordered_map<Ident, Expr>& assignments,
     const Expr& cond
 ) {
-    auto ans = Table::select_rows(cond);
+    auto ans = Table::filter_rows(cond);
 
     for (auto* row : ans) {
         for (const auto& [col, expr] : assignments) {
@@ -97,7 +137,7 @@ std::vector<Row*> Table::update_rows(
         }
     }
 
-    return ans;
+    return ans.size();
 }
 
 size_t Table::delete_rows(const Expr& cond) {

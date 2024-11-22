@@ -1,9 +1,13 @@
 #include "Database.hpp"
 
 #include "Table.hpp"
+#include "TempTable.hpp"
 #include "parsing.hpp"
+#include "queries.hpp"
+
 #include <cassert>
 #include <iostream>
+#include <tuple>
 #include <memory>
 #include <optional>
 #include <stdexcept>
@@ -45,65 +49,63 @@ void Database::create_table_query(CreateTableQuery q) {
 void Database::drop_table_query(DropTableQuery q) {
     remove_table(q.table_name);
 }
-std::vector<Row*> Database::insert_query(InsertQuery q) {
+void Database::insert_query(InsertQuery q) {
     auto* table = get_table(q.table_name);
     if (auto* named = std::get_if<RowInitializerNamed>(&q.row)) {
-        return {table->insert_row_named(std::move(*named))};
+        table->insert_row_named(std::move(*named));
     } else if (auto* positioned = std::get_if<RowInitializerPositioned>(&q.row)) {
-        return {table->insert_row_positioned(std::move(*positioned))};
+        table->insert_row_positioned(std::move(*positioned));
     } else {
         // Unreachable
         assert(false);
     }
 }
-std::vector<Row*> Database::select_query(SelectQuery q) const {
-    return get_table(q.table_name)->select_rows(std::move(q.cond));
+TempTable Database::select_query(SelectQuery q) const {
+    return get_table(q.table_name)->select_rows(std::move(q.exprs), std::move(q.cond));
 }
-std::vector<Row*> Database::update_query(UpdateQuery q) {
+size_t Database::update_query(UpdateQuery q) {
     return get_table(q.table_name)->update_rows(std::move(q.assignments), std::move(q.cond));
 }
-void Database::delete_query(DeleteQuery q) {
-    get_table(q.table_name)->delete_rows(std::move(q.cond));
+size_t Database::delete_query(DeleteQuery q) {
+    return get_table(q.table_name)->delete_rows(std::move(q.cond));
 }
 
-std::optional<std::vector<Row*>> Database::query(AnyQuery query) {
+QueryResult Database::query(AnyQuery query) {
     if (auto* q = std::get_if<CreateTableQuery>(&query)) {
         create_table_query(std::move(*q));
-        return std::nullopt;
+        return {std::tuple<>()};
     } else if (auto* q = std::get_if<DropTableQuery>(&query)) {
         drop_table_query(std::move(*q));
-        return std::nullopt;
+        return {std::tuple<>()};
     } else if (auto* q = std::get_if<SelectQuery>(&query)) {
         return {select_query(std::move(*q))};
     } else if (auto* q = std::get_if<InsertQuery>(&query)) {
-        return {insert_query(std::move(*q))};
+        insert_query(std::move(*q));
+        return {std::tuple<>()};
     } else if (auto* q = std::get_if<UpdateQuery>(&query)) {
         return {update_query(std::move(*q))};
     } else if (auto* q = std::get_if<DeleteQuery>(&query)) {
-        delete_query(std::move(*q));
-        return std::nullopt;
+        return {delete_query(std::move(*q))};
     } else {
         assert(false);
     }
 }
 
-std::optional<std::vector<Row*>> Database::query(std::string_view q) {
+QueryResult Database::query(std::string_view q) {
     return query(parser::parse(query_parser, q));
 }
 
-std::vector<std::vector<Row*>> Database::queries(std::vector<AnyQuery> queries) {
-    std::vector<std::vector<Row*>> ans;
+std::vector<QueryResult> Database::queries(std::vector<AnyQuery> queries) {
+    std::vector<QueryResult> ans;
 
     for (auto& q : queries) {
         auto query_ans = query(std::move(q));
-        if (query_ans.has_value()) {
-            ans.push_back(std::move(*query_ans));
-        }
+        ans.push_back(std::move(query_ans));
     }
 
     return ans;
 }
 
-std::vector<std::vector<Row*>> Database::queries(std::string_view q) {
+std::vector<QueryResult> Database::queries(std::string_view q) {
     return queries(parser::parse(queries_parser, q));
 }

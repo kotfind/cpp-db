@@ -4,10 +4,13 @@
 #include "Ident.hpp"
 #include "RowInitializerNamed.hpp"
 #include "RowInitializerPositioned.hpp"
+#include "TempTable.hpp"
 
-#include <vector>
+#include <tuple>
+#include <variant>
 
 class Column;
+class TempTable;
 
 struct CreateTableQuery {
     const Ident table_name;
@@ -19,7 +22,7 @@ struct DropTableQuery {
 };
 
 struct SelectQuery {
-    // TODO: select expressions
+    const std::vector<Expr> exprs;
     const Ident table_name;
     const Expr cond;
 };
@@ -48,3 +51,9 @@ using AnyQuery = std::variant<
     UpdateQuery,
     DeleteQuery
 >;
+
+struct QueryResult : std::variant<
+    TempTable,   // Rows
+    size_t,      // Rows affected
+    std::tuple<> // Nothing
+> {};

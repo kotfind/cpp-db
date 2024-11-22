@@ -9,6 +9,7 @@
 #include <unordered_map>
 
 class Table;
+class TempTable;
 
 class Database {
     public:
@@ -22,16 +23,16 @@ class Database {
 
         void create_table_query(CreateTableQuery);
         void drop_table_query(DropTableQuery);
-        std::vector<Row*> insert_query(InsertQuery);
-        std::vector<Row*> select_query(SelectQuery) const;
-        std::vector<Row*> update_query(UpdateQuery);
-        void delete_query(DeleteQuery);
+        void insert_query(InsertQuery);
+        TempTable select_query(SelectQuery) const;
+        size_t update_query(UpdateQuery);
+        size_t delete_query(DeleteQuery);
 
-        std::optional<std::vector<Row*>> query(AnyQuery query);
-        std::optional<std::vector<Row*>> query(std::string_view query);
+        QueryResult query(AnyQuery query);
+        QueryResult query(std::string_view query);
 
-        std::vector<std::vector<Row*>> queries(std::vector<AnyQuery> queries);
-        std::vector<std::vector<Row*>> queries(std::string_view queries);
+        std::vector<QueryResult> queries(std::vector<AnyQuery> queries);
+        std::vector<QueryResult> queries(std::string_view queries);
 
     private:
         std::unordered_map<Ident, std::unique_ptr<Table>> tables;

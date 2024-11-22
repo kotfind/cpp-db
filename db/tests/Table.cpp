@@ -77,12 +77,12 @@ TEST(select, table)
     auto table = get_filled_table();
 
     ASSERT(cmp_ids(
-        table.select_rows(Ident("name") == Value::from_string("Ivan")),
+        table.filter_rows(Ident("name") == Value::from_string("Ivan")),
         {1}
     ));
 
     ASSERT(cmp_ids(
-        table.select_rows(Ident("is_male")),
+        table.filter_rows(Ident("is_male")),
         {1, 3}
     ));
 END_TEST
@@ -108,7 +108,7 @@ TEST(delete, table)
     table.delete_rows(!Ident("is_male"));
 
     ASSERT(cmp_ids(
-        table.select_rows(Value::from_bool(true)),
+        table.filter_rows(Value::from_bool(true)),
         {1, 3}
     ));
 END_TEST

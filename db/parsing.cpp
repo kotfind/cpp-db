@@ -665,8 +665,8 @@ static is_parser_for<SelectQuery> auto select_query =
         ),
         [](auto tup) {
             auto [exprs, table_name, cond] = std::move(tup);
-            // TODO: don't ignore exprs
             return SelectQuery {
+                .exprs = std::move(exprs),
                 .table_name = std::move(table_name),
                 .cond = std::move(cond)
             };

@@ -1,12 +1,12 @@
 #pragma once
 
 #include "Value.hpp"
+#include "TempRow.hpp"
+#include "TempColumn.hpp"
 
 #include <memory>
 #include <vector>
 
-class TempRow;
-class TempColumn;
 class Expr;
 
 class TempTable {

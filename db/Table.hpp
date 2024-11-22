@@ -10,6 +10,7 @@
 #include <vector>
 
 class Expr;
+class TempTable;
 
 class Table {
     public:
@@ -29,9 +30,11 @@ class Table {
 
         size_t get_coulmn_num_by_name(const Ident& name) const;
 
-        std::vector<Row*> select_rows(const Expr& cond) const;
+        std::vector<Row*> filter_rows(const Expr& cond) const;
 
-        std::vector<Row*> update_rows(const std::unordered_map<Ident, Expr>& assignments, const Expr& cond);
+        TempTable select_rows(const std::vector<Expr>& exprs, const Expr& cond) const;
+
+        size_t update_rows(const std::unordered_map<Ident, Expr>& assignments, const Expr& cond);
 
         size_t delete_rows(const Expr& cond);
 
