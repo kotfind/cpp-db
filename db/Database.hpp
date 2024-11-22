@@ -5,6 +5,7 @@
 #include "queries.hpp"
 
 #include <memory>
+#include <string_view>
 #include <unordered_map>
 
 class Table;
@@ -24,7 +25,13 @@ class Database {
         std::vector<Row*> insert_query(InsertQuery);
         std::vector<Row*> select_query(SelectQuery) const;
         std::vector<Row*> update_query(UpdateQuery);
-        size_t delete_query(DeleteQuery);
+        void delete_query(DeleteQuery);
+
+        std::optional<std::vector<Row*>> query(AnyQuery query);
+        std::optional<std::vector<Row*>> query(std::string_view query);
+
+        std::vector<std::vector<Row*>> queries(std::vector<AnyQuery> queries);
+        std::vector<std::vector<Row*>> queries(std::string_view queries);
 
     private:
         std::unordered_map<Ident, std::unique_ptr<Table>> tables;

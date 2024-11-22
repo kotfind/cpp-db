@@ -1,4 +1,4 @@
-#include "test_utils.hpp"
+#include <test_utils.hpp>
 
 #include "Database.hpp"
 #include "Column.hpp"
@@ -78,7 +78,7 @@ TEST(complex, database)
         ASSERT_EQ(resp[0]->get_id(), 2);
     }
 
-    auto resp = db.delete_query({
+    db.delete_query({
         .table_name = Ident("people"),
         .cond = Ident("name") == Value::from_string("James")
     });
@@ -91,4 +91,70 @@ TEST(complex, database)
 
         ASSERT_EQ(resp.size(), 0);
     }
+END_TEST
+
+TEST(complex_queries, database)
+    Database db;
+
+    db.queries(R"(
+        CREATE TABLE people (
+            name: str,
+            is_male: bool,
+        );
+
+        INSERT ("Ivan", true) TO people;
+        INSERT ("Ann", true) TO people;
+        INSERT ("Jack", true) TO people;
+
+        UPDATE people
+        SET
+            name = "James"
+        WHERE
+            name == "Jack";
+    )");
+
+    {
+        auto resp = db.query(R"(
+            SELECT name, is_male
+            FROM people
+            WHERE name == "James"
+        )");
+
+        ASSERT(resp.has_value());
+        ASSERT_EQ(resp->size(), 1);
+        ASSERT_EQ((*resp)[0]->get_id(), 3);
+    }
+
+    {
+        auto resp = db.query(R"(
+            SELECT name, is_male
+            FROM people
+            WHERE |name| == 3
+        )");
+
+        ASSERT(resp.has_value());
+        ASSERT_EQ(resp->size(), 1);
+        ASSERT_EQ((*resp)[0]->get_id(), 2);
+    }
+
+    db.query(R"(
+        DELETE
+        FROM people
+        WHERE name == "James"
+    )");
+
+    {
+        auto resp = db.query(R"(
+            SELECT name, is_male
+            FROM people
+            WHERE name == "James"
+        )");
+
+        ASSERT(resp.has_value());
+        ASSERT_EQ(resp->size(), 0);
+    }
+
+    db.query("DROP TABLE people");
+
+    ASSERT(!db.has_table(Ident("people")));
 END_TEST

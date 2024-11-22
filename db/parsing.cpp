@@ -733,14 +733,14 @@ parser::Parser<DeleteQuery> delete_query_parser = delete_query;
 
 // -------------------- Queries --------------------
 static is_parser_for<AnyQuery> auto query =
-    any(
+    seq(ws, any(
         cast(create_table_query, [](auto v) -> AnyQuery { return {std::move(v)}; }),
         cast(drop_table_query,   [](auto v) -> AnyQuery { return {std::move(v)}; }),
         cast(insert_query,       [](auto v) -> AnyQuery { return {std::move(v)}; }),
         cast(select_query,       [](auto v) -> AnyQuery { return {std::move(v)}; }),
         cast(update_query,       [](auto v) -> AnyQuery { return {std::move(v)}; }),
         cast(delete_query,       [](auto v) -> AnyQuery { return {std::move(v)}; })
-    );
+    ), ws);
 parser::Parser<AnyQuery> query_parser = query;
 
 static is_parser_for<std::vector<AnyQuery>> auto queries =

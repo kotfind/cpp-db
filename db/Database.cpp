@@ -1,9 +1,11 @@
 #include "Database.hpp"
 
 #include "Table.hpp"
+#include "parsing.hpp"
 #include <cassert>
 #include <iostream>
 #include <memory>
+#include <optional>
 #include <stdexcept>
 #include <variant>
 
@@ -60,6 +62,48 @@ std::vector<Row*> Database::select_query(SelectQuery q) const {
 std::vector<Row*> Database::update_query(UpdateQuery q) {
     return get_table(q.table_name)->update_rows(std::move(q.assignments), std::move(q.cond));
 }
-size_t Database::delete_query(DeleteQuery q) {
-    return get_table(q.table_name)->delete_rows(std::move(q.cond));
+void Database::delete_query(DeleteQuery q) {
+    get_table(q.table_name)->delete_rows(std::move(q.cond));
+}
+
+std::optional<std::vector<Row*>> Database::query(AnyQuery query) {
+    if (auto* q = std::get_if<CreateTableQuery>(&query)) {
+        create_table_query(std::move(*q));
+        return std::nullopt;
+    } else if (auto* q = std::get_if<DropTableQuery>(&query)) {
+        drop_table_query(std::move(*q));
+        return std::nullopt;
+    } else if (auto* q = std::get_if<SelectQuery>(&query)) {
+        return {select_query(std::move(*q))};
+    } else if (auto* q = std::get_if<InsertQuery>(&query)) {
+        return {insert_query(std::move(*q))};
+    } else if (auto* q = std::get_if<UpdateQuery>(&query)) {
+        return {update_query(std::move(*q))};
+    } else if (auto* q = std::get_if<DeleteQuery>(&query)) {
+        delete_query(std::move(*q));
+        return std::nullopt;
+    } else {
+        assert(false);
+    }
+}
+
+std::optional<std::vector<Row*>> Database::query(std::string_view q) {
+    return query(parser::parse(query_parser, q));
+}
+
+std::vector<std::vector<Row*>> Database::queries(std::vector<AnyQuery> queries) {
+    std::vector<std::vector<Row*>> ans;
+
+    for (auto& q : queries) {
+        auto query_ans = query(std::move(q));
+        if (query_ans.has_value()) {
+            ans.push_back(std::move(*query_ans));
+        }
+    }
+
+    return ans;
+}
+
+std::vector<std::vector<Row*>> Database::queries(std::string_view q) {
+    return queries(parser::parse(queries_parser, q));
 }
