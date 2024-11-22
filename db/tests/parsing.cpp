@@ -6,6 +6,7 @@
 
 #include <cstring>
 #include <iostream>
+#include <optional>
 
 TEST_GROUP(parsing)
 
@@ -104,7 +105,7 @@ TEST_GROUP(queries, parsing)
         ASSERT_EQ(parsed.table_name, Ident("people"));
     END_TEST
 
-    TEST(insert_query, queries)
+    TEST(insert_query_named, queries)
         auto str =
             R"(INSERT (
                 name = "Ivan",
@@ -122,7 +123,20 @@ TEST_GROUP(queries, parsing)
         ASSERT_EQ(row->get_values().at(Ident("age")), Value::from_int(20));
     END_TEST
 
-    // TODO: test insert positioned
+    TEST(insert_query_positioned, queries)
+        auto str =
+            R"(INSERT ("Ivan",) TO people)";
+
+        auto parsed = parse(insert_query_parser, str);
+
+        ASSERT_EQ(parsed.table_name, Ident("people"));
+
+        auto* row = std::get_if<RowInitializerPositioned>(&parsed.row);
+        ASSERT(row != nullptr);
+
+        ASSERT_EQ(row->get_values()[0], Value::from_string("Ivan"));
+        ASSERT_EQ(row->get_values()[1], std::nullopt);
+    END_TEST
 
     TEST(select_query, queries)
         auto str =
@@ -202,4 +216,36 @@ TEST_GROUP(queries, parsing)
             parsed.cond,
             Value::from_bool(true)
         ));
+    END_TEST
+
+    TEST(queries, queries)
+        auto str = R"(
+            CREATE TABLE users (
+                name: /* some comment */ string[32],
+                pass: bytes[8],
+                is_admin: bool = false,
+            );
+
+            INSERT ("Ivan", 0xa1c,) TO users;
+
+            INSERT (name = "Jack", pass = 0xaaa, is_admin = true) TO users;
+
+            SELECT name, |name|, pass
+            FROM users
+            WHERE is_admin == true;
+
+            UPDATE users
+            SET
+                is_admin = !is_admin
+            WHERE
+                name == "Ivan";
+
+            DELETE
+            FROM users
+            WHERE name == "Jack";
+
+            DROP TABLE users;
+        )";
+
+        parse(queries_parser, str);
     END_TEST

@@ -39,3 +39,12 @@ struct DeleteQuery {
     const Ident table_name;
     const Expr cond;
 };
+
+using AnyQuery = std::variant<
+    CreateTableQuery,
+    DropTableQuery,
+    SelectQuery,
+    InsertQuery,
+    UpdateQuery,
+    DeleteQuery
+>;

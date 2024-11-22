@@ -656,7 +656,7 @@ static is_parser_for<SelectQuery> auto select_query =
         seq(
             ignore(S("select")),
             ws1,
-            csv(seq(neg(S("from")), ident)), // column_names
+            csv(seq(neg(S("from")), lazy(expr))), // exprs
             ws1,
             ignore(S("from")),
             ws,
@@ -664,8 +664,8 @@ static is_parser_for<SelectQuery> auto select_query =
             opt_where_clause // cond
         ),
         [](auto tup) {
-            auto [column_names, table_name, cond] = std::move(tup);
-            // TODO: don't ignore column_names
+            auto [exprs, table_name, cond] = std::move(tup);
+            // TODO: don't ignore exprs
             return SelectQuery {
                 .table_name = std::move(table_name),
                 .cond = std::move(cond)
@@ -715,6 +715,7 @@ static is_parser_for<DeleteQuery> auto delete_query =
     cast(
         seq(
             ignore(S("delete")),
+            ignore(opt(seq(ws1, S("from")))),
             ws1,
             ident, // table_name
             opt_where_clause // cond
@@ -729,3 +730,27 @@ static is_parser_for<DeleteQuery> auto delete_query =
         }
     );
 parser::Parser<DeleteQuery> delete_query_parser = delete_query;
+
+// -------------------- Queries --------------------
+static is_parser_for<AnyQuery> auto query =
+    any(
+        cast(create_table_query, [](auto v) -> AnyQuery { return {std::move(v)}; }),
+        cast(drop_table_query,   [](auto v) -> AnyQuery { return {std::move(v)}; }),
+        cast(insert_query,       [](auto v) -> AnyQuery { return {std::move(v)}; }),
+        cast(select_query,       [](auto v) -> AnyQuery { return {std::move(v)}; }),
+        cast(update_query,       [](auto v) -> AnyQuery { return {std::move(v)}; }),
+        cast(delete_query,       [](auto v) -> AnyQuery { return {std::move(v)}; })
+    );
+parser::Parser<AnyQuery> query_parser = query;
+
+static is_parser_for<std::vector<AnyQuery>> auto queries =
+    seq(
+        ws,
+        betw(
+            query,
+            seq(ws, c(';'), ws)
+        ),
+        ignore(opt(seq(ws, c(';'), ws))),
+        ws
+    );
+parser::Parser<std::vector<AnyQuery>> queries_parser = queries;
