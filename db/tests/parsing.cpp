@@ -165,3 +165,34 @@ TEST_GROUP(queries, parsing)
             Value::from_int(2) * Ident("age") - Value::from_int(10)
         ));
     END_TEST
+
+    TEST(delete_query, queries)
+        auto str =
+            R"(DELETE
+                people
+            WHERE
+                name == "Ivan")";
+
+        auto parsed = parse(delete_query_parser, str);
+
+        ASSERT_EQ(parsed.table_name, Ident("people"));
+
+        ASSERT(is_same(
+            parsed.cond,
+            Ident("name") == Value::from_string("Ivan")
+        ));
+    END_TEST
+
+    TEST(no_where_clause, queries)
+        auto str =
+            R"(DELETE people)";
+
+        auto parsed = parse(delete_query_parser, str);
+
+        ASSERT_EQ(parsed.table_name, Ident("people"));
+
+        ASSERT(is_same(
+            parsed.cond,
+            Value::from_bool(true)
+        ));
+    END_TEST

@@ -692,3 +692,24 @@ static is_parser_for<UpdateQuery> auto update_query =
         }
     );
 parser::Parser<UpdateQuery> update_query_parser = update_query;
+
+// -------------------- Delete Query --------------------
+static is_parser_for<DeleteQuery> auto delete_query = 
+    cast(
+        seq(
+            ignore(S("delete")),
+            ws,
+            ident, // table_name
+            ws,
+            opt_where_clause // cond
+        ),
+        [](auto tup) {
+            auto [table_name, cond] = std::move(tup);
+
+            return DeleteQuery {
+                .table_name = std::move(table_name),
+                .cond = std::move(cond),
+            };
+        }
+    );
+parser::Parser<DeleteQuery> delete_query_parser = delete_query;
