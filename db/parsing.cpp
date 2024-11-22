@@ -251,115 +251,6 @@ static is_parser_for<ValueType> auto type =
 
 parser::Parser<ValueType> type_parser = type;
 
-// -------------------- Create Table Query --------------------
-
-// TODO: attributes
-static is_parser_for<Column> auto column_def =
-    cast(
-        seq(
-            ident, // name
-            ws,
-            ignore(c(':')),
-            ws,
-            type, // type
-            opt(seq( // default_value
-                ws,
-                ignore(c('=')),
-                ws,
-                value
-            ))
-        ),
-        [](auto tup) {
-            auto [name, type, default_value] = std::move(tup);
-            return Column(
-                std::move(name),
-                std::move(type),
-                std::move(default_value)
-            );
-        }
-    );
-
-static is_parser_for<CreateTableQuery> auto create_table_query =
-    cast(
-        seq(
-            ignore(S("create")),
-            ws,
-            ignore(S("table")),
-            ws,
-            ident, // name
-            ws,
-            braced(csv(column_def)) // columns
-        ),
-        [](auto tup) {
-            auto [name, columns] = std::move(tup);
-            return CreateTableQuery {
-                .table_name = std::move(name),
-                .columns = std::move(columns),
-            };
-        }
-    );
-parser::Parser<CreateTableQuery> create_table_query_parser = create_table_query;
-
-// -------------------- Insert Query --------------------
-
-static is_parser_for<RowInitializerNamed> auto row_initializer_named =
-    cast(
-        braced(csv(seq(
-            ident, // name
-            ws,
-            ignore(c('=')),
-            ws,
-            value // value
-        ))),
-        [](auto value_defs) {
-            std::unordered_map<Ident, Value> values;
-            values.reserve(value_defs.size());
-            for (auto& value_def : value_defs) {
-                auto [name, value] = std::move(value_def);
-                values.insert({name, value});
-            }
-            return RowInitializerNamed(std::move(values));
-        }
-    );
-
-static is_parser_for<RowInitializerPositioned> auto row_initializer_positioned =
-    cast(
-        braced(csv(opt(value))),
-        [](auto value_defs) {
-            return RowInitializerPositioned(std::move(value_defs));
-        }
-    );
-
-using RowInitializerVariant = std::variant<RowInitializerNamed, RowInitializerPositioned>;
-
-static is_parser_for<RowInitializerVariant> auto row_initializer =
-    any(
-        cast(row_initializer_positioned, [](auto v) { return RowInitializerVariant{v}; }),
-        cast(row_initializer_named,      [](auto v) { return RowInitializerVariant{v}; })
-    );
-
-static is_parser_for<InsertQuery> auto insert_query =
-    cast(
-        seq(
-            ignore(S("insert")),
-            ws,
-            row_initializer, // row
-            ws,
-            ignore(S("to")),
-            ws,
-            ident // table_name
-        ),
-        [](auto tup) {
-            auto [row, table_name] = std::move(tup);
-
-            return InsertQuery {
-                .row = std::move(row),
-                .table_name = std::move(table_name),
-            };
-        }
-    );
-parser::Parser<InsertQuery> insert_query_parser = insert_query;
-
 // -------------------- Expr --------------------
 
 static Parser<Expr> expr();
@@ -610,3 +501,146 @@ Parser<Expr> expr() {
 }
 
 Parser<Expr> expr_parser = expr();
+
+// -------------------- Create Table Query --------------------
+
+// TODO: attributes
+static is_parser_for<Column> auto column_def =
+    cast(
+        seq(
+            ident, // name
+            ws,
+            ignore(c(':')),
+            ws,
+            type, // type
+            opt(seq( // default_value
+                ws,
+                ignore(c('=')),
+                ws,
+                value
+            ))
+        ),
+        [](auto tup) {
+            auto [name, type, default_value] = std::move(tup);
+            return Column(
+                std::move(name),
+                std::move(type),
+                std::move(default_value)
+            );
+        }
+    );
+
+static is_parser_for<CreateTableQuery> auto create_table_query =
+    cast(
+        seq(
+            ignore(S("create")),
+            ws,
+            ignore(S("table")),
+            ws,
+            ident, // name
+            ws,
+            braced(csv(column_def)) // columns
+        ),
+        [](auto tup) {
+            auto [name, columns] = std::move(tup);
+            return CreateTableQuery {
+                .table_name = std::move(name),
+                .columns = std::move(columns),
+            };
+        }
+    );
+parser::Parser<CreateTableQuery> create_table_query_parser = create_table_query;
+
+// -------------------- Insert Query --------------------
+
+static is_parser_for<RowInitializerNamed> auto row_initializer_named =
+    cast(
+        braced(csv(seq(
+            ident, // name
+            ws,
+            ignore(c('=')),
+            ws,
+            value // value
+        ))),
+        [](auto value_defs) {
+            std::unordered_map<Ident, Value> values;
+            values.reserve(value_defs.size());
+            for (auto& value_def : value_defs) {
+                auto [name, value] = std::move(value_def);
+                values.insert({name, value});
+            }
+            return RowInitializerNamed(std::move(values));
+        }
+    );
+
+static is_parser_for<RowInitializerPositioned> auto row_initializer_positioned =
+    cast(
+        braced(csv(opt(value))),
+        [](auto value_defs) {
+            return RowInitializerPositioned(std::move(value_defs));
+        }
+    );
+
+using RowInitializerVariant = std::variant<RowInitializerNamed, RowInitializerPositioned>;
+
+static is_parser_for<RowInitializerVariant> auto row_initializer =
+    any(
+        cast(row_initializer_positioned, [](auto v) { return RowInitializerVariant{v}; }),
+        cast(row_initializer_named,      [](auto v) { return RowInitializerVariant{v}; })
+    );
+
+static is_parser_for<InsertQuery> auto insert_query =
+    cast(
+        seq(
+            ignore(S("insert")),
+            ws,
+            row_initializer, // row
+            ws,
+            ignore(S("to")),
+            ws,
+            ident // table_name
+        ),
+        [](auto tup) {
+            auto [row, table_name] = std::move(tup);
+
+            return InsertQuery {
+                .row = std::move(row),
+                .table_name = std::move(table_name),
+            };
+        }
+    );
+parser::Parser<InsertQuery> insert_query_parser = insert_query;
+
+// -------------------- Select Query --------------------
+
+static is_parser_for<SelectQuery> auto select_query = 
+    cast(
+        seq(
+            ignore(S("select")),
+            ws,
+            csv(seq(neg(S("from")), ident)), // column_names
+            ws,
+            ignore(S("from")),
+            ws,
+            ident, // table_name
+            opt(seq( // cond
+                ws,
+                ignore(S("where")),
+                ws,
+                lazy(expr) // expr
+            ))
+        ),
+        [](auto tup) {
+            auto [column_names, table_name, cond_] = std::move(tup);
+            // TODO: don't ignore column_names
+            Expr cond = cond_.has_value()
+                ? std::move(*cond_)
+                : Expr(Value::from_bool(true));
+
+            return SelectQuery {
+                .table_name = std::move(table_name),
+                .cond = std::move(cond)
+            };
+        }
+    );
+parser::Parser<SelectQuery> select_query_parser = select_query;

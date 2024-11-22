@@ -65,6 +65,23 @@ TEST(type, parsing)
     ASSERT_EQ(parse(type_parser, "ByTes [ 123]"), ValueType::BYTES);
 END_TEST
 
+TEST_GROUP(expr, parsing)
+
+    TEST(simple, expr)
+        ASSERT_EQ(
+            parse(expr_parser, "2 + 3 * 4").eval(VarMap {}),
+            Value::from_int(14)
+        );
+    END_TEST
+
+    TEST(precedence, expr)
+        ASSERT(is_same(
+            parse(expr_parser, "a || b && c ^^ d == e > f + g - h * (i + !j)"),
+            Ident("a") || Ident("b") && Ident("c") ^ Ident("d") == Ident("e") >
+            Ident("f") + Ident("g") - Ident("h") * (Ident("i") + !Ident("j"))
+        ));
+    END_TEST
+
 TEST_GROUP(queries, parsing)
 
     TEST(create_table_query, queries)
@@ -98,20 +115,22 @@ TEST_GROUP(queries, parsing)
         ASSERT_EQ(row->get_values().at(Ident("age")), Value::from_int(20));
     END_TEST
 
+    // TODO: test insert positioned
 
-TEST_GROUP(expr, parsing)
+    TEST(select_query, queries)
+        auto str =
+            R"(SELECT
+                name,
+                age,
+            FROM people WHERE age > 18 || name == "Ivan")";
 
-    TEST(simple, expr)
-        ASSERT_EQ(
-            parse(expr_parser, "2 + 3 * 4").eval(VarMap {}),
-            Value::from_int(14)
-        );
-    END_TEST
+        auto parsed = parse(select_query_parser, str);
 
-    TEST(precedence, expr)
+        // TODO: check fields
+
+        ASSERT_EQ(parsed.table_name, Ident("people"));
         ASSERT(is_same(
-            parse(expr_parser, "a || b && c ^^ d == e > f + g - h * (i + !j)"),
-            Ident("a") || Ident("b") && Ident("c") ^ Ident("d") == Ident("e") >
-            Ident("f") + Ident("g") - Ident("h") * (Ident("i") + !Ident("j"))
+            parsed.cond,
+            Ident("age") > Value::from_int(18) || Ident("name") == Value::from_string("Ivan")
         ));
     END_TEST
