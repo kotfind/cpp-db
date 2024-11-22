@@ -42,6 +42,8 @@ class BinaryExpr {
         BinaryExprOp op;
         std::unique_ptr<Expr> lhs;
         std::unique_ptr<Expr> rhs;
+
+    friend bool is_same(const BinaryExpr& lhs, const BinaryExpr& rhs);
 };
 
 enum class UnaryExprOp {
@@ -63,6 +65,8 @@ class UnaryExpr {
     private:
         UnaryExprOp op;
         std::unique_ptr<Expr> arg;
+
+    friend bool is_same(const UnaryExpr& lhs, const UnaryExpr& rhs);
 };
 
 class Expr {
@@ -81,8 +85,9 @@ class Expr {
             Value,
             Ident
         > inner;
-};
 
+    friend bool is_same(const Expr& lhs, const Expr& rhs);
+};
 
 Expr operator<(Expr lhs, Expr rhs);
 Expr operator>(Expr lhs, Expr rhs);
@@ -98,8 +103,8 @@ Expr operator/(Expr lhs, Expr rhs);
 Expr operator%(Expr lhs, Expr rhs);
 Expr operator-(Expr arg);
 
-Expr operator|(Expr lhs, Expr rhs);
-Expr operator&(Expr lhs, Expr rhs);
+Expr operator||(Expr lhs, Expr rhs);
+Expr operator&&(Expr lhs, Expr rhs);
 Expr operator^(Expr lhs, Expr rhs);
 Expr operator!(Expr arg);
 

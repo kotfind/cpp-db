@@ -412,7 +412,8 @@ static Parser<Expr> expr_prec_1() {
         seq(
             lazy(expr_prec_0), // expr
             rep(seq( // exprs
-                seq(ws, any(c('*'), c('/'), c('%')), ws), // exprs.op
+                ws,
+                any(c('*'), c('/'), c('%')), // exprs.op
                 ws,
                 lazy(expr_prec_0) // exprs.other_expr
             ))
@@ -448,7 +449,8 @@ static Parser<Expr> expr_prec_2() {
         seq(
             lazy(expr_prec_1), // expr
             rep(seq( // exprs
-                seq(ws, any(c('+'), c('-')), ws), // exprs.op
+                ws,
+                any(c('+'), c('-')), // exprs.op
                 ws,
                 lazy(expr_prec_1) // exprs.other_expr
             ))
@@ -475,10 +477,136 @@ static Parser<Expr> expr_prec_2() {
     return p;
 }
 
+static Parser<Expr> expr_prec_3() {
+    static Parser<Expr> p = cast(
+        seq(
+            lazy(expr_prec_2), // expr
+            opt(seq( // exprs
+                ws,
+                any(s("<"), s(">"), s(">="), s("<=")), // exprs.op
+                ws,
+                lazy(expr_prec_2) // exprs.other_expr
+            ))
+        ),
+        [](auto tup) -> Expr {
+            auto [expr, exprs] = std::move(tup);
+            if (!exprs.has_value()) {
+                return expr;
+            }
+            auto [op, other_expr] = std::move(*exprs);
+            if (op == "<") {
+                return std::move(expr) < std::move(other_expr);
+            } else if (op == ">") {
+                return std::move(expr) > std::move(other_expr);
+            } else if (op == "<=") {
+                return std::move(expr) <= std::move(other_expr);
+            } else if (op == ">=") {
+                return std::move(expr) >= std::move(other_expr);
+            } else {
+                assert(false);
+            }
+        }
+    );
+    return p;
+}
+
+static Parser<Expr> expr_prec_4() {
+    static Parser<Expr> p = cast(
+        seq(
+            lazy(expr_prec_3), // expr
+            opt(seq( // exprs
+                ws,
+                any(s("=="), s("!=")), // exprs.op
+                ws,
+                lazy(expr_prec_3) // exprs.other_expr
+            ))
+        ),
+        [](auto tup) -> Expr {
+            auto [expr, exprs] = std::move(tup);
+            if (!exprs.has_value()) {
+                return expr;
+            }
+            auto [op, other_expr] = std::move(*exprs);
+            if (op == "==") {
+                return std::move(expr) == std::move(other_expr);
+            } else if (op == "!=") {
+                return std::move(expr) != std::move(other_expr);
+            } else {
+                assert(false);
+            }
+        }
+    );
+    return p;
+}
+
+static Parser<Expr> expr_prec_5() {
+    static Parser<Expr> p = cast(
+        seq(
+            lazy(expr_prec_4), // expr
+            rep(seq( // exprs
+                ws,
+                s("^^"), // exprs.op
+                ws,
+                lazy(expr_prec_4) // exprs.other_expr
+            ))
+        ),
+        [](auto tup) -> Expr {
+            auto [expr, exprs] = std::move(tup);
+            for (auto& [op, other_expr] : exprs) {
+                expr = std::move(expr) ^ std::move(other_expr);
+            }
+            return std::move(expr);
+        }
+    );
+    return p;
+}
+
+static Parser<Expr> expr_prec_6() {
+    static Parser<Expr> p = cast(
+        seq(
+            lazy(expr_prec_5), // expr
+            rep(seq( // exprs
+                ws,
+                s("&&"), // exprs.op
+                ws,
+                lazy(expr_prec_5) // exprs.other_expr
+            ))
+        ),
+        [](auto tup) -> Expr {
+            auto [expr, exprs] = std::move(tup);
+            for (auto& [op, other_expr] : exprs) {
+                expr = std::move(expr) && std::move(other_expr);
+            }
+            return std::move(expr);
+        }
+    );
+    return p;
+}
+
+static Parser<Expr> expr_prec_7() {
+    static Parser<Expr> p = cast(
+        seq(
+            lazy(expr_prec_6), // expr
+            rep(seq( // exprs
+                ws,
+                s("||"), // exprs.op
+                ws,
+                lazy(expr_prec_6) // exprs.other_expr
+            ))
+        ),
+        [](auto tup) -> Expr {
+            auto [expr, exprs] = std::move(tup);
+            for (auto& [op, other_expr] : exprs) {
+                expr = std::move(expr) || std::move(other_expr);
+            }
+            return std::move(expr);
+        }
+    );
+    return p;
+}
+
 Parser<Expr> expr() {
-    // static Parser<Expr> ans = expr_prec_2;
-    // static Parser<Expr> p = expr_prec_0;
-    return expr_prec_2();
+    return expr_prec_7();
 }
 
 Parser<Expr> expr_parser = expr();

@@ -107,3 +107,11 @@ TEST_GROUP(expr, parsing)
             Value::from_int(14)
         );
     END_TEST
+
+    TEST(precedence, expr)
+        ASSERT(is_same(
+            parse(expr_parser, "a || b && c ^^ d == e > f + g - h * (i + !j)"),
+            Ident("a") || Ident("b") && Ident("c") ^ Ident("d") == Ident("e") >
+            Ident("f") + Ident("g") - Ident("h") * (Ident("i") + !Ident("j"))
+        ));
+    END_TEST
