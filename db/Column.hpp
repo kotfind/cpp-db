@@ -20,4 +20,4 @@ class Column {
         std::optional<Value> default_value;
 };
 
-bool operator==(const Column &lhs, const Column &rhs);
+bool operator==(const Column& lhs, const Column& rhs);

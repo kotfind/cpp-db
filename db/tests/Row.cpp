@@ -6,7 +6,7 @@
 
 TEST_GROUP(row)
 
-Table get_empty_table() {
+static Table get_empty_table() {
     Table table(Ident("people"), {
         Column(Ident("name"), ValueType::STRING),
         Column(Ident("is_male"), ValueType::BOOL, Value::from_bool(true)),
@@ -15,7 +15,7 @@ Table get_empty_table() {
     return table;
 }
 
-Table get_filled_table() {
+static Table get_filled_table() {
     auto table = get_empty_table();
 
     table.insert_row_positioned({{

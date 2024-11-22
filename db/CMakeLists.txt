@@ -14,6 +14,9 @@ target_sources(${TARGET}
         Expr.cpp
         Database.cpp
         parsing.cpp
+        TempColumn.cpp
+        TempRow.cpp
+        TempTable.cpp
 )
 
 target_include_directories(${TARGET}
