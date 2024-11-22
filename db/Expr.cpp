@@ -2,6 +2,7 @@
 #include <cassert>
 #include <memory>
 #include <stdexcept>
+#include <utility>
 #include <variant>
 
 BinaryExpr::BinaryExpr(BinaryExprOp op_, std::unique_ptr<Expr> lhs_, std::unique_ptr<Expr> rhs_)
@@ -21,6 +22,14 @@ BinaryExpr::BinaryExpr(const BinaryExpr& other)
     lhs(std::make_unique<Expr>(*other.lhs)),
     rhs(std::make_unique<Expr>(*other.rhs))
 {}
+
+BinaryExpr& BinaryExpr::operator=(const BinaryExpr& other) {
+    op = other.op;
+    lhs = std::make_unique<Expr>(*other.lhs);
+    rhs = std::make_unique<Expr>(*other.rhs);
+    return *this;
+}
+
 
 Value BinaryExpr::eval(const VarMap& vars) const {
     auto lhs = this->lhs->eval(vars);
@@ -90,6 +99,12 @@ UnaryExpr::UnaryExpr(const UnaryExpr& other)
     arg(std::make_unique<Expr>(*other.arg))
 {}
 
+UnaryExpr& UnaryExpr::operator=(const UnaryExpr& other) {
+    op = other.op;
+    arg = std::make_unique<Expr>(*other.arg);
+    return *this;
+}
+
 Value UnaryExpr::eval(const VarMap& vars) const {
     auto arg = this->arg->eval(vars);
     switch (op) {
@@ -148,23 +163,23 @@ Value Expr::eval(const VarMap& vars) const {
     }
 }
 
-Expr operator<(Expr lhs, Expr rhs) { return BinaryExpr(BinaryExprOp::LE, lhs, rhs); }
-Expr operator>(Expr lhs, Expr rhs) { return BinaryExpr(BinaryExprOp::GR, lhs, rhs); }
-Expr operator<=(Expr lhs, Expr rhs) { return BinaryExpr(BinaryExprOp::LEQ, lhs, rhs); }
-Expr operator>=(Expr lhs, Expr rhs) { return BinaryExpr(BinaryExprOp::GEQ, lhs, rhs); }
-Expr operator==(Expr lhs, Expr rhs) { return BinaryExpr(BinaryExprOp::EQ, lhs, rhs); }
-Expr operator!=(Expr lhs, Expr rhs) { return BinaryExpr(BinaryExprOp::NEQ, lhs, rhs); }
+Expr operator<(Expr lhs, Expr rhs) { return BinaryExpr(BinaryExprOp::LE, std::move(lhs), std::move(rhs)); }
+Expr operator>(Expr lhs, Expr rhs) { return BinaryExpr(BinaryExprOp::GR, std::move(lhs), std::move(rhs)); }
+Expr operator<=(Expr lhs, Expr rhs) { return BinaryExpr(BinaryExprOp::LEQ, std::move(lhs), std::move(rhs)); }
+Expr operator>=(Expr lhs, Expr rhs) { return BinaryExpr(BinaryExprOp::GEQ, std::move(lhs), std::move(rhs)); }
+Expr operator==(Expr lhs, Expr rhs) { return BinaryExpr(BinaryExprOp::EQ, std::move(lhs), std::move(rhs)); }
+Expr operator!=(Expr lhs, Expr rhs) { return BinaryExpr(BinaryExprOp::NEQ, std::move(lhs), std::move(rhs)); }
 
-Expr operator+(Expr lhs, Expr rhs) { return BinaryExpr(BinaryExprOp::ADD, lhs, rhs); }
-Expr operator-(Expr lhs, Expr rhs) { return BinaryExpr(BinaryExprOp::SUB, lhs, rhs); }
-Expr operator*(Expr lhs, Expr rhs) { return BinaryExpr(BinaryExprOp::MUL, lhs, rhs); }
-Expr operator/(Expr lhs, Expr rhs) { return BinaryExpr(BinaryExprOp::DIV, lhs, rhs); }
-Expr operator%(Expr lhs, Expr rhs) { return BinaryExpr(BinaryExprOp::MOD, lhs, rhs); }
-Expr operator-(Expr arg) { return UnaryExpr(UnaryExprOp::MINUS, arg); }
+Expr operator+(Expr lhs, Expr rhs) { return BinaryExpr(BinaryExprOp::ADD, std::move(lhs), std::move(rhs)); }
+Expr operator-(Expr lhs, Expr rhs) { return BinaryExpr(BinaryExprOp::SUB, std::move(lhs), std::move(rhs)); }
+Expr operator*(Expr lhs, Expr rhs) { return BinaryExpr(BinaryExprOp::MUL, std::move(lhs), std::move(rhs)); }
+Expr operator/(Expr lhs, Expr rhs) { return BinaryExpr(BinaryExprOp::DIV, std::move(lhs), std::move(rhs)); }
+Expr operator%(Expr lhs, Expr rhs) { return BinaryExpr(BinaryExprOp::MOD, std::move(lhs), std::move(rhs)); }
+Expr operator-(Expr arg) { return UnaryExpr(UnaryExprOp::MINUS, std::move(arg)); }
 
-Expr operator|(Expr lhs, Expr rhs) { return BinaryExpr(BinaryExprOp::OR, lhs, rhs); }
-Expr operator&(Expr lhs, Expr rhs) { return BinaryExpr(BinaryExprOp::AND, lhs, rhs); }
-Expr operator^(Expr lhs, Expr rhs) { return BinaryExpr(BinaryExprOp::XOR, lhs, rhs); }
-Expr operator!(Expr arg) { return UnaryExpr(UnaryExprOp::NOT, arg); }
+Expr operator|(Expr lhs, Expr rhs) { return BinaryExpr(BinaryExprOp::OR, std::move(lhs), std::move(rhs)); }
+Expr operator&(Expr lhs, Expr rhs) { return BinaryExpr(BinaryExprOp::AND, std::move(lhs), std::move(rhs)); }
+Expr operator^(Expr lhs, Expr rhs) { return BinaryExpr(BinaryExprOp::XOR, std::move(lhs), std::move(rhs)); }
+Expr operator!(Expr arg) { return UnaryExpr(UnaryExprOp::NOT, std::move(arg)); }
 
-Expr len(Expr arg) { return UnaryExpr(UnaryExprOp::LEN, arg); }
+Expr len(Expr arg) { return UnaryExpr(UnaryExprOp::LEN, std::move(arg)); }

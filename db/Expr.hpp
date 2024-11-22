@@ -34,6 +34,8 @@ class BinaryExpr {
         BinaryExpr(BinaryExprOp op, Expr lhs, Expr rhs);
         BinaryExpr(const BinaryExpr& other);
 
+        BinaryExpr& operator=(const BinaryExpr& other);
+
         Value eval(const VarMap& vars) const;
 
     private:
@@ -53,6 +55,8 @@ class UnaryExpr {
         UnaryExpr(UnaryExprOp op, std::unique_ptr<Expr> arg);
         UnaryExpr(UnaryExprOp op, Expr arg);
         UnaryExpr(const UnaryExpr& other);
+
+        UnaryExpr& operator=(const UnaryExpr& other);
 
         Value eval(const VarMap& vars) const;
 

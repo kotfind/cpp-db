@@ -4,11 +4,13 @@
 #include "Value.hpp"
 #include "Column.hpp"
 #include "queries.hpp"
+#include "Expr.hpp"
 
 #include <charconv>
 #include <parser.hpp>
 #include <string>
 #include <tuple>
+#include <cassert>
 
 using namespace parser;
 
@@ -357,3 +359,126 @@ static is_parser_for<InsertQuery> auto insert_query =
         }
     );
 parser::Parser<InsertQuery> insert_query_parser = insert_query;
+
+// -------------------- Expr --------------------
+
+static Parser<Expr> expr();
+
+static Parser<Expr> expr_prec_0() {
+    static Parser<Expr> p = any(
+        // len
+        cast(
+            seq(
+                ignore(c('|')),
+                ws,
+                lazy(expr), // expr
+                ws,
+                ignore(c('|'))
+            ),
+            [](auto expr) -> Expr {
+                return len(std::move(expr));
+            }
+        ),
+        // braced
+        braced(lazy(expr)),
+        // value
+        cast(value, [](auto v) -> Expr { return {v}; }),
+        // ident
+        cast(ident, [](auto i) -> Expr { return {i}; }),
+        // unary operator
+        cast(
+            seq(
+                any(c('+'), c('-'), c('!')), // op
+                ws,
+                lazy(expr) // expr
+            ),
+            [](auto tup) {
+                auto [op, expr] = std::move(tup);
+
+                switch (op) {
+                    case '+': return std::move(expr);
+                    case '-': return -std::move(expr);
+                    case '!': return !std::move(expr);
+                    default:  assert(false);
+                }
+            }
+        )
+    );
+    return p;
+}
+
+static Parser<Expr> expr_prec_1() {
+    static Parser<Expr> p = cast(
+        seq(
+            lazy(expr_prec_0), // expr
+            rep(seq( // exprs
+                seq(ws, any(c('*'), c('/'), c('%')), ws), // exprs.op
+                ws,
+                lazy(expr_prec_0) // exprs.other_expr
+            ))
+        ),
+        [](auto tup) -> Expr {
+            auto [expr, exprs] = std::move(tup);
+            for (auto& [op, other_expr] : exprs) {
+                switch (op) {
+                    case '*':
+                        expr = std::move(expr) * std::move(other_expr);
+                        break;
+
+                    case '/':
+                        expr = std::move(expr) / std::move(other_expr);
+                        break;
+
+                    case '%':
+                        expr = std::move(expr) % std::move(other_expr);
+                        break;
+
+                    default:
+                        assert(false);
+                }
+            }
+            return std::move(expr);
+        }
+    );
+    return p;
+}
+
+static Parser<Expr> expr_prec_2() {
+    static Parser<Expr> p = cast(
+        seq(
+            lazy(expr_prec_1), // expr
+            rep(seq( // exprs
+                seq(ws, any(c('+'), c('-')), ws), // exprs.op
+                ws,
+                lazy(expr_prec_1) // exprs.other_expr
+            ))
+        ),
+        [](auto tup) -> Expr {
+            auto [expr, exprs] = std::move(tup);
+            for (auto& [op, other_expr] : exprs) {
+                switch (op) {
+                    case '+':
+                        expr = std::move(expr) + std::move(other_expr);
+                        break;
+
+                    case '-':
+                        expr = std::move(expr) - std::move(other_expr);
+                        break;
+
+                    default:
+                        assert(false);
+                }
+            }
+            return std::move(expr);
+        }
+    );
+    return p;
+}
+
+Parser<Expr> expr() {
+    // static Parser<Expr> ans = expr_prec_2;
+    // static Parser<Expr> p = expr_prec_0;
+    return expr_prec_2();
+}
+
+Parser<Expr> expr_parser = expr();

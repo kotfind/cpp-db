@@ -1,9 +1,11 @@
+#include "Expr.hpp"
 #include "test_utils.hpp"
 
 #include "Column.hpp"
 #include "parsing.hpp"
 
 #include <cstring>
+#include <iostream>
 
 TEST_GROUP(parsing)
 
@@ -94,4 +96,14 @@ TEST_GROUP(queries, parsing)
 
         ASSERT_EQ(row->get_values().at(Ident("name")), Value::from_string("Ivan"));
         ASSERT_EQ(row->get_values().at(Ident("age")), Value::from_int(20));
+    END_TEST
+
+
+TEST_GROUP(expr, parsing)
+
+    TEST(simple, expr)
+        ASSERT_EQ(
+            parse(expr_parser, "2 + 3 * 4").eval(VarMap {}),
+            Value::from_int(14)
+        );
     END_TEST
