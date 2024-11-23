@@ -5,6 +5,7 @@
 #include "TempColumn.hpp"
 
 #include <memory>
+#include <ostream>
 #include <vector>
 
 class Expr;
@@ -29,3 +30,5 @@ class TempTable {
         std::vector<TempColumn> columns;
         std::vector<std::unique_ptr<TempRow>> rows;
 };
+
+std::ostream& operator<<(std::ostream& out, const TempTable& table);

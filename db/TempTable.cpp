@@ -57,3 +57,31 @@ void TempTable::insert_row(TempRow row) {
 
     rows.push_back(std::make_unique<TempRow>(std::move(row)));
 }
+
+std::ostream& operator<<(std::ostream& out, const TempTable& table) {
+    if (table.count_rows() == 0) {
+        out << "EMPTY\n";
+    }
+
+    for (size_t col_num = 0; col_num < table.count_columns(); ++col_num) {
+        if (col_num != 0) {
+            out << " | ";
+        }
+        auto col = table.get_column(col_num);
+        out << col.get_name() << " (" << col.get_type() << ")";
+    }
+    out << '\n';
+
+    for (size_t row_num = 0; row_num < table.count_rows(); ++row_num) {
+        auto& row = *table.get_row_by_num(row_num);
+        for (size_t i = 0; i < row.size(); ++i) {
+            if (i != 0) {
+                out << " | ";
+            }
+            out << row[i];
+        }
+        out << '\n';
+    }
+
+    return out;
+}
