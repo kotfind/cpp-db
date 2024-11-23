@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+cd ..
+./run db-demo-run

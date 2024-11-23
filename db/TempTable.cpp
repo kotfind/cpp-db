@@ -68,7 +68,7 @@ std::ostream& operator<<(std::ostream& out, const TempTable& table) {
             out << " | ";
         }
         auto col = table.get_column(col_num);
-        out << col.get_name() << " (" << col.get_type() << ")";
+        out << col.get_name();
     }
     out << '\n';
 

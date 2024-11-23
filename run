@@ -5,6 +5,7 @@ set -e
 ALL_TARGETS=(
     "db-test"
     "parser-test"
+    "db-demo"
 )
 
 # Parse command line args

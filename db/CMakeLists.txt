@@ -27,7 +27,7 @@ target_include_directories(${TARGET}
 )
 
 set_target_properties(${TARGET} PROPERTIES PUBLIC_HEADER
-    include/test_utils.hpp
+    include/db.hpp
 )
 
 target_link_libraries(${TARGET} PRIVATE parser)
