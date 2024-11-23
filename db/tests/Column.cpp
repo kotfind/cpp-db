@@ -13,7 +13,7 @@ END_TEST
 
 TEST(default_value, column)
     Column col(Ident("age"), ValueType::INT, Value::from_int(18));
-    ASSERT_EQ(*col.get_default_value(), Value::from_int(18));
+    ASSERT_EQ(*col.get_default_value_ext(1), Value::from_int(18));
 END_TEST
 
 TEST(eq, column)

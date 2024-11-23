@@ -504,10 +504,42 @@ Parser<Expr> expr_parser = expr();
 
 // -------------------- Create Table Query --------------------
 
+static is_parser_for<ColumnAttrs> auto attrs =
+    cast(
+        opt(
+            seq(
+                ignore(c('{')),
+                ws,
+                csv(any(S("unique"), S("autoincrement"))), // attrs
+                ws,
+                ignore(c('}')),
+                ws
+            )
+        ),
+        [](auto attr_words_opt) -> ColumnAttrs {
+            if (!attr_words_opt.has_value()) {
+                return COL_ATTR_NONE;
+            }
+            auto attr_words = *attr_words_opt;
+
+            ColumnAttrs attrs = COL_ATTR_NONE;
+            for (const auto& attr_word : attr_words) {
+                if (attr_word == "unique") {
+                    attrs = (ColumnAttrs)(attrs | COL_ATTR_UNIQE);
+                } else if (attr_word == "autoincrement") {
+                    attrs = (ColumnAttrs)(attrs | COL_ATTR_AUTOINCREMENT);
+                }
+            }
+            return attrs;
+        }
+    );
+    
+
 // TODO: attributes
 static is_parser_for<Column> auto column_def =
     cast(
         seq(
+            attrs, // attrs
             ident, // name
             ws,
             ignore(c(':')),
@@ -521,11 +553,12 @@ static is_parser_for<Column> auto column_def =
             ))
         ),
         [](auto tup) {
-            auto [name, type, default_value] = std::move(tup);
+            auto [attrs, name, type, default_value] = std::move(tup);
             return Column(
                 std::move(name),
                 std::move(type),
-                std::move(default_value)
+                std::move(default_value),
+                std::move(attrs)
             );
         }
     );

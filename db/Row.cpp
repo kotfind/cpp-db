@@ -11,7 +11,7 @@
 
 /// Returns value that should be pushed to row if possible.
 /// Throws warning otherwise.
-Value resolve_row_value(const Column& col, std::optional<Value> value) {
+Value resolve_row_value(size_t id, const Column& col, std::optional<Value> value) {
     if (value.has_value()) {
         if (col.get_type() != value->get_type()) {
             std::stringstream ss;
@@ -23,13 +23,14 @@ Value resolve_row_value(const Column& col, std::optional<Value> value) {
 
         return *value;
     } else {
-        if (!col.get_default_value().has_value()) {
+        auto def = col.get_default_value_ext(id);
+        if (!def.has_value()) {
             std::stringstream ss;
             ss  << "failed to create row: neither value nor default value was specified for field " << col.get_name();
             throw std::invalid_argument(ss.str());
         }
 
-        return *col.get_default_value();
+        return *def;
     }
 }
 
@@ -52,12 +53,14 @@ Row::Row(Table* table_, size_t id_, RowInitializerNamed initializer_)
         auto& col = table->get_column(col_id);
         if (init_vals.contains(col.get_name())) {
             data.push_back(resolve_row_value(
+                id,
                 col,
                 std::optional<Value>(std::move(init_vals.at(col.get_name())))
             ));
             ++values_used;
         } else {
             data.push_back(resolve_row_value(
+                id,
                 col,
                 std::optional<Value>()
             ));
@@ -101,13 +104,14 @@ Row::Row(Table* table_, size_t id_, RowInitializerPositioned initializer_)
 
             data.push_back(std::move(*value));
         } else {
-            if (!col.get_default_value().has_value()) {
+            auto def = col.get_default_value_ext(id);
+            if (!def.has_value()) {
                 std::stringstream ss;
                 ss  << "failed to create row: neither value nor default value was specified for field " << col.get_name();
                 throw std::invalid_argument(ss.str());
             }
 
-            data.push_back(*col.get_default_value());
+            data.push_back(*def);
         }
     }
 }
