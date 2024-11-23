@@ -1,5 +1,5 @@
 #include "Expr.hpp"
-#include "test_utils.hpp"
+#include <test_utils.hpp>
 
 #include "Column.hpp"
 #include "parsing.hpp"

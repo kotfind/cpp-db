@@ -5,7 +5,7 @@
 #include "lazy.hpp"
 #include "ignore.hpp"
 #include "parse.hpp"
-#include "parser.hpp"
+#include <parser.hpp>
 #include "any.hpp"
 #include "string.hpp"
 #include "sequence.hpp"
