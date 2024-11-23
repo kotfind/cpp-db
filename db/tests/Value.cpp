@@ -1,4 +1,6 @@
 #include "test_utils.hpp"
+#include <iostream>
+#include <sstream>
 
 #include "Value.hpp"
 
@@ -150,3 +152,19 @@ TEST_GROUP(boolean, value)
         ASSERT_EQ(!Value::from_bool(false),  true);
         ASSERT_EQ(!Value::from_bool( true), false);
     END_TEST
+
+template<typename T>
+std::string to_string(const T& x) {
+    std::stringstream ss;
+    ss << x;
+    return ss.str();
+}
+
+TEST(print, value)
+    ASSERT_EQ(to_string(Value::from_string("hello\nworld")), R"("hello\nworld")");
+    ASSERT_EQ(to_string(Value::from_int(-42)), "-42");
+    ASSERT_EQ(to_string(Value::from_bool(true)), "true");
+
+    std::vector<std::byte> bytes = {std::byte {0xab}, std::byte{0xcd}};
+    ASSERT_EQ(to_string(Value::from_bytes(bytes)), "0xabcd");
+END_TEST

@@ -78,3 +78,5 @@ bool operator||(const Value& lhs, const Value& rhs);
 bool operator&&(const Value& lhs, const Value& rhs);
 bool operator^(const Value& lhs, const Value& rhs);
 bool operator!(const Value& arg);
+
+std::ostream& operator<<(std::ostream& out, const Value& value);

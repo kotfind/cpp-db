@@ -2,6 +2,8 @@
 
 #include <cassert>
 #include <cstdint>
+#include <ios>
+#include <ostream>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -243,4 +245,55 @@ bool operator^(const Value& lhs, const Value& rhs) {
 }
 bool operator!(const Value& arg) {
     return !arg.get_bool();
+}
+
+std::ostream& operator<<(std::ostream& out, const Value& value) {
+    if (auto* v = value.try_get_bool()) {
+        if (*v) {
+            out << "true";
+        } else {
+            out << "false";
+        }
+    } else if (auto* v = value.try_get_int()) {
+        out << *v;
+    } else if (auto* v = value.try_get_string()) {
+        out << '"';
+        for (char ch : *v) {
+            switch (ch) {
+                case '\n':
+                    out << "\\n";
+                    break;
+
+                case '\t':
+                    out << "\\t";
+                    break;
+
+                case '\\':
+                    out << "\\\\";
+                    break;
+
+                case '\r':
+                    out << "\\r";
+                    break;
+
+                default:
+                    out << ch;
+                    break;
+            }
+        }
+        out << '"';
+    } else if (auto* v = value.try_get_bytes()) {
+        out << "0x";
+
+        auto it = v->begin();
+        while (it != v->end()) {
+            auto h = (int)(*it) / 16;
+            auto l = (int)(*it) % 16;
+            ++it;
+            out << std::hex << h << l;
+        }
+    } else {
+        assert(false);
+    }
+    return out;
 }
